@@ -3,6 +3,7 @@ import { Navbar } from "@/components/layout/navbar";
 import { Footer } from "@/components/layout/footer";
 import { Button } from "@/components/ui/button";
 import { SpotlightCard } from "@/components/ui/spotlight-card";
+import { HeroGovBR } from "@/components/ui/hero-govbr";
 import {
   AlertTriangle,
   ThumbsUp,
@@ -16,6 +17,7 @@ import {
   Shield,
   CheckCircle,
   ArrowRight,
+  Plus,
 } from "lucide-react";
 
 const TIPOS = [
@@ -100,59 +102,25 @@ const PASSOS = [
   },
 ];
 
-// Grid 4+3: first 4 in a 4-col row, last 3 centered in a 3-col row
 const TIPOS_ROW1 = TIPOS.slice(0, 4);
 const TIPOS_ROW2 = TIPOS.slice(4);
 
 export default function HomePage() {
   return (
-    <div className="flex flex-col min-h-screen">
+    <div className="flex flex-col min-h-screen bg-[#f8f8f8]">
       <Navbar />
 
-      {/* ── Hero ─────────────────────────────────────────────────────────── */}
-      <section
-        style={{ background: "linear-gradient(135deg, #071D41 0%, #1351B4 100%)" }}
-        className="text-white py-20 px-4"
-      >
-        <div className="max-w-4xl mx-auto text-center">
-          <span
-            className="inline-block text-xs font-semibold uppercase tracking-widest px-3 py-1 rounded-full mb-6"
-            style={{ background: "#FFCD07", color: "#1B1B1B" }}
-          >
-            Portal do Cidadão
-          </span>
-          <h1 className="text-4xl sm:text-5xl font-bold leading-tight mb-6">
-            Sua voz chega onde precisa.
-          </h1>
-          <p className="text-lg sm:text-xl text-white/80 max-w-2xl mx-auto mb-10 leading-relaxed">
-            Registre, acompanhe e receba resposta sobre suas manifestações à
-            Assistência Social — tudo em um só lugar.
-          </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Link href="/login">
-              <Button
-                size="lg"
-                className="px-8 font-semibold text-base"
-                style={{ background: "#FFCD07", color: "#1B1B1B" }}
-              >
-                Fazer uma manifestação
-              </Button>
-            </Link>
-            <Link href="/consultar-protocolo">
-              <Button
-                size="lg"
-                variant="outline"
-                className="px-8 font-semibold text-base border-white/40 text-white hover:bg-white/10"
-              >
-                <Search className="w-4 h-4 mr-2" />
-                Consultar protocolo
-              </Button>
-            </Link>
-          </div>
-        </div>
-      </section>
+      {/* ── SEÇÃO 1: Hero ─────────────────────────────────────────────────
+          Sem botões CTA — foco na mensagem e na foto do cidadão.
+          Hierarquia: Badge → H1 → Subtítulo → Trust indicators
+      ────────────────────────────────────────────────────────────────── */}
+      <HeroGovBR />
 
-      {/* ── Tipos de Manifestação ─────────────────────────────────────────── */}
+      {/* ── SEÇÃO 2: Tipos de Manifestação ────────────────────────────────
+          Cards com SpotlightCard + grid 4+3 centralizado.
+          CTAs ("Fazer manifestação" e "Consultar protocolo") no rodapé
+          desta seção — após o usuário ver as opções disponíveis.
+      ────────────────────────────────────────────────────────────────── */}
       <section
         className="py-20 px-4"
         style={{ background: "linear-gradient(180deg, #F8F9FC 0%, #FFFFFF 100%)" }}
@@ -188,29 +156,17 @@ export default function HomePage() {
                     spotlightColor={tipo.spotlightColor}
                     className="h-full rounded-2xl border border-[#E8EAF0] bg-white shadow-sm hover:shadow-lg hover:-translate-y-1 transition-all duration-300 p-6 flex flex-col"
                   >
-                    {/* Icon badge */}
                     <div
                       className="w-14 h-14 rounded-xl flex items-center justify-center mb-5 transition-transform duration-300 group-hover:scale-110"
                       style={{ background: tipo.bg }}
                     >
                       <Icon className="w-7 h-7" style={{ color: tipo.cor }} />
                     </div>
-
-                    {/* Text content */}
                     <div className="flex-1">
-                      <h3 className="font-bold text-base text-[#1B1B1B] mb-2">
-                        {tipo.label}
-                      </h3>
-                      <p className="text-sm text-[#6B6B6B] leading-relaxed">
-                        {tipo.descricao}
-                      </p>
+                      <h3 className="font-bold text-base text-[#1B1B1B] mb-2">{tipo.label}</h3>
+                      <p className="text-sm text-[#6B6B6B] leading-relaxed">{tipo.descricao}</p>
                     </div>
-
-                    {/* CTA link */}
-                    <div
-                      className="mt-5 flex items-center gap-1 text-sm font-semibold transition-gap duration-200"
-                      style={{ color: tipo.cor }}
-                    >
+                    <div className="mt-5 flex items-center gap-1 text-sm font-semibold" style={{ color: tipo.cor }}>
                       <span>Registrar</span>
                       <ArrowRight className="w-4 h-4 transition-transform duration-200 group-hover:translate-x-1" />
                     </div>
@@ -220,7 +176,7 @@ export default function HomePage() {
             })}
           </div>
 
-          {/* Row 2 — 3 cards centered (matching 3 of 4 columns width) */}
+          {/* Row 2 — 3 cards centered */}
           <div className="mt-5 grid grid-cols-1 sm:grid-cols-3 gap-5 lg:w-[calc(75%-0.375rem)] lg:mx-auto">
             {TIPOS_ROW2.map((tipo) => {
               const Icon = tipo.icon;
@@ -230,29 +186,17 @@ export default function HomePage() {
                     spotlightColor={tipo.spotlightColor}
                     className="h-full rounded-2xl border border-[#E8EAF0] bg-white shadow-sm hover:shadow-lg hover:-translate-y-1 transition-all duration-300 p-6 flex flex-col"
                   >
-                    {/* Icon badge */}
                     <div
                       className="w-14 h-14 rounded-xl flex items-center justify-center mb-5 transition-transform duration-300 group-hover:scale-110"
                       style={{ background: tipo.bg }}
                     >
                       <Icon className="w-7 h-7" style={{ color: tipo.cor }} />
                     </div>
-
-                    {/* Text content */}
                     <div className="flex-1">
-                      <h3 className="font-bold text-base text-[#1B1B1B] mb-2">
-                        {tipo.label}
-                      </h3>
-                      <p className="text-sm text-[#6B6B6B] leading-relaxed">
-                        {tipo.descricao}
-                      </p>
+                      <h3 className="font-bold text-base text-[#1B1B1B] mb-2">{tipo.label}</h3>
+                      <p className="text-sm text-[#6B6B6B] leading-relaxed">{tipo.descricao}</p>
                     </div>
-
-                    {/* CTA link */}
-                    <div
-                      className="mt-5 flex items-center gap-1 text-sm font-semibold"
-                      style={{ color: tipo.cor }}
-                    >
+                    <div className="mt-5 flex items-center gap-1 text-sm font-semibold" style={{ color: tipo.cor }}>
                       <span>Registrar</span>
                       <ArrowRight className="w-4 h-4 transition-transform duration-200 group-hover:translate-x-1" />
                     </div>
@@ -262,40 +206,41 @@ export default function HomePage() {
             })}
           </div>
 
-          {/* Bottom note */}
-          <p className="text-center text-sm text-[#6B6B6B] mt-10">
-            Prazo legal de até{" "}
-            <strong className="text-[#1351B4]">20 dias úteis</strong> para resposta · Serviço 100% gratuito
-          </p>
+          {/* ── CTAs — posicionados ABAIXO dos cards, após o usuário ver as opções ── */}
+          <div className="mt-14 flex flex-col items-center gap-4">
+            <p className="text-sm text-[#6B6B6B] mb-2">
+              Prazo legal de até{" "}
+              <strong className="text-[#1351B4]">20 dias úteis</strong>{" "}
+              para resposta · Serviço 100% gratuito
+            </p>
+            <div className="flex flex-col sm:flex-row gap-3 w-full max-w-md">
+              <Link href="/login" className="flex-1">
+                <Button
+                  size="lg"
+                  fullWidth
+                  className="font-bold text-base shadow-md shadow-[#1351b4]/20"
+                >
+                  <Plus className="w-5 h-5" />
+                  Fazer uma manifestação
+                </Button>
+              </Link>
+              <Link href="/consultar-protocolo" className="flex-1">
+                <Button
+                  size="lg"
+                  variant="outline"
+                  fullWidth
+                  className="font-semibold text-base"
+                >
+                  <Search className="w-5 h-5" />
+                  Consultar protocolo
+                </Button>
+              </Link>
+            </div>
+          </div>
         </div>
       </section>
 
-      {/* ── Consultar Protocolo ───────────────────────────────────────────── */}
-      <section className="py-16 px-4" style={{ background: "#F8F8F8" }}>
-        <div className="max-w-3xl mx-auto text-center">
-          <h2
-            className="text-2xl font-bold mb-3"
-            style={{ color: "#1351B4" }}
-          >
-            Acompanhar manifestação
-          </h2>
-          <p className="text-muted-foreground mb-6">
-            Já registrou uma demanda na ouvidoria? Insira o número de protocolo para acompanhar o andamento.
-          </p>
-          <Link href="/consultar-protocolo">
-            <Button
-              size="lg"
-              className="font-semibold px-8"
-              style={{ background: "#FFCD07", color: "#1B1B1B" }}
-            >
-              <Search className="w-4 h-4 mr-2" />
-              Consultar Protocolo
-            </Button>
-          </Link>
-        </div>
-      </section>
-
-      {/* ── Como Funciona ─────────────────────────────────────────────────── */}
+      {/* ── SEÇÃO 3: Como Funciona ─────────────────────────────────────── */}
       <section className="py-16 px-4 bg-white" id="como-funciona">
         <div className="max-w-5xl mx-auto">
           <div className="text-center mb-12">
@@ -305,7 +250,7 @@ export default function HomePage() {
             >
               Como funciona
             </h2>
-            <p className="text-muted-foreground">
+            <p className="text-[#6B6B6B]">
               Processo simples e transparente, do registro à resposta.
             </p>
           </div>
@@ -318,17 +263,15 @@ export default function HomePage() {
                 >
                   {passo.num}
                 </div>
-                <h3 className="font-semibold mb-2 text-sm">{passo.titulo}</h3>
-                <p className="text-xs text-muted-foreground leading-relaxed">
-                  {passo.descricao}
-                </p>
+                <h3 className="font-semibold mb-2 text-sm text-[#1B1B1B]">{passo.titulo}</h3>
+                <p className="text-xs text-[#6B6B6B] leading-relaxed">{passo.descricao}</p>
               </div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* ── Garantias ─────────────────────────────────────────────────────── */}
+      {/* ── SEÇÃO 4: Garantias ─────────────────────────────────────────── */}
       <section
         style={{ background: "#1351B4" }}
         className="py-12 px-4 text-white"
@@ -336,9 +279,9 @@ export default function HomePage() {
         <div className="max-w-5xl mx-auto">
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-8 text-center">
             {[
-              { icon: Clock, text: "Prazo de resposta de até 20 dias úteis" },
-              { icon: Shield, text: "Dados protegidos pela LGPD" },
-              { icon: CheckCircle, text: "Serviço público gratuito" },
+              { icon: Clock,        text: "Prazo de resposta de até 20 dias úteis" },
+              { icon: Shield,       text: "Dados protegidos pela LGPD" },
+              { icon: CheckCircle,  text: "Serviço público gratuito" },
             ].map((item) => {
               const Icon = item.icon;
               return (
