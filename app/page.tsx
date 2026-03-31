@@ -3,7 +3,7 @@ import { Navbar } from "@/components/layout/navbar";
 import { Footer } from "@/components/layout/footer";
 import { Button } from "@/components/ui/button";
 import { SpotlightCard } from "@/components/ui/spotlight-card";
-import { HeroGovBR } from "@/components/ui/hero-govbr";
+import { ShuffleHero } from "@/components/ui/shuffle-hero";
 import {
   AlertTriangle,
   ThumbsUp,
@@ -13,11 +13,7 @@ import {
   Info,
   ThumbsDown,
   Search,
-  Clock,
-  Shield,
-  CheckCircle,
   ArrowRight,
-  Plus,
 } from "lucide-react";
 
 const TIPOS = [
@@ -80,26 +76,10 @@ const TIPOS = [
 ];
 
 const PASSOS = [
-  {
-    num: "01",
-    titulo: "Cadastre-se ou entre",
-    descricao: "Crie sua conta gratuitamente ou acesse com o GOV.BR.",
-  },
-  {
-    num: "02",
-    titulo: "Escolha o tipo de manifestação",
-    descricao: "Denúncia, elogio, reclamação, sugestão e outros.",
-  },
-  {
-    num: "03",
-    titulo: "Receba seu protocolo",
-    descricao: "Um número único para acompanhar sua manifestação.",
-  },
-  {
-    num: "04",
-    titulo: "Acompanhe e receba resposta",
-    descricao: "Prazo de até 20 dias úteis para resposta da ouvidoria.",
-  },
+  { num: "01", titulo: "Cadastre-se ou entre", descricao: "Crie sua conta gratuitamente ou acesse com o GOV.BR." },
+  { num: "02", titulo: "Escolha o tipo de manifestação", descricao: "Denúncia, elogio, reclamação, sugestão e outros." },
+  { num: "03", titulo: "Receba seu protocolo", descricao: "Um número único para acompanhar sua manifestação." },
+  { num: "04", titulo: "Acompanhe e receba resposta", descricao: "Prazo de até 20 dias úteis para resposta da ouvidoria." },
 ];
 
 const TIPOS_ROW1 = TIPOS.slice(0, 4);
@@ -107,20 +87,13 @@ const TIPOS_ROW2 = TIPOS.slice(4);
 
 export default function HomePage() {
   return (
-    <div className="flex flex-col min-h-screen bg-[#f8f8f8]">
+    <div className="flex flex-col min-h-screen bg-white">
       <Navbar />
 
-      {/* ── SEÇÃO 1: Hero ─────────────────────────────────────────────────
-          Sem botões CTA — foco na mensagem e na foto do cidadão.
-          Hierarquia: Badge → H1 → Subtítulo → Trust indicators
-      ────────────────────────────────────────────────────────────────── */}
-      <HeroGovBR />
+      {/* ── SEÇÃO 1: Hero com shuffle grid ──────────────────────────────── */}
+      <ShuffleHero />
 
-      {/* ── SEÇÃO 2: Tipos de Manifestação ────────────────────────────────
-          Cards com SpotlightCard + grid 4+3 centralizado.
-          CTAs ("Fazer manifestação" e "Consultar protocolo") no rodapé
-          desta seção — após o usuário ver as opções disponíveis.
-      ────────────────────────────────────────────────────────────────── */}
+      {/* ── SEÇÃO 2: O que você quer fazer? ─────────────────────────────── */}
       <section
         className="py-20 px-4"
         style={{ background: "linear-gradient(180deg, #F8F9FC 0%, #FFFFFF 100%)" }}
@@ -128,21 +101,15 @@ export default function HomePage() {
       >
         <div className="max-w-6xl mx-auto">
 
-          {/* Section header */}
+          {/* Header da seção — sem o label "Tipos de manifestação" */}
           <div className="text-center mb-14">
-            <span
-              className="inline-block text-xs font-semibold uppercase tracking-widest px-3 py-1 rounded-full mb-4"
-              style={{ background: "#D4E6FF", color: "#1351B4" }}
-            >
-              Tipos de manifestação
-            </span>
             <h2 className="text-3xl sm:text-4xl font-bold mb-4 text-[#1B1B1B]">
               O que você quer{" "}
               <span style={{ color: "#1351B4" }}>fazer hoje?</span>
             </h2>
             <p className="text-base text-[#6B6B6B] max-w-xl mx-auto leading-relaxed">
-              Escolha o tipo de manifestação que melhor descreve sua situação.
-              Todos os canais são gratuitos e têm prazo legal de resposta.
+              Escolha o canal que melhor descreve sua situação.
+              Todos são gratuitos e têm prazo legal de resposta.
             </p>
           </div>
 
@@ -176,7 +143,7 @@ export default function HomePage() {
             })}
           </div>
 
-          {/* Row 2 — 3 cards centered */}
+          {/* Row 2 — 3 cards centralizados */}
           <div className="mt-5 grid grid-cols-1 sm:grid-cols-3 gap-5 lg:w-[calc(75%-0.375rem)] lg:mx-auto">
             {TIPOS_ROW2.map((tipo) => {
               const Icon = tipo.icon;
@@ -206,48 +173,46 @@ export default function HomePage() {
             })}
           </div>
 
-          {/* ── CTAs — posicionados ABAIXO dos cards, após o usuário ver as opções ── */}
-          <div className="mt-14 flex flex-col items-center gap-4">
-            <p className="text-sm text-[#6B6B6B] mb-2">
-              Prazo legal de até{" "}
-              <strong className="text-[#1351B4]">20 dias úteis</strong>{" "}
-              para resposta · Serviço 100% gratuito
-            </p>
-            <div className="flex flex-col sm:flex-row gap-3 w-full max-w-md">
-              <Link href="/login" className="flex-1">
-                <Button
-                  size="lg"
-                  fullWidth
-                  className="font-bold text-base shadow-md shadow-[#1351b4]/20"
-                >
-                  <Plus className="w-5 h-5" />
-                  Fazer uma manifestação
-                </Button>
-              </Link>
-              <Link href="/consultar-protocolo" className="flex-1">
-                <Button
-                  size="lg"
-                  variant="outline"
-                  fullWidth
-                  className="font-semibold text-base"
-                >
-                  <Search className="w-5 h-5" />
-                  Consultar protocolo
-                </Button>
-              </Link>
-            </div>
+          {/* CTAs abaixo dos cards */}
+          <div className="mt-14 flex flex-col sm:flex-row gap-3 justify-center max-w-md mx-auto">
+            <Link href="/login" className="flex-1">
+              <Button size="lg" fullWidth className="font-bold text-base shadow-md shadow-[#1351b4]/20">
+                Fazer uma manifestação
+              </Button>
+            </Link>
+            <Link href="/consultar-protocolo" className="flex-1">
+              <Button size="lg" variant="outline" fullWidth className="font-semibold text-base">
+                <Search className="w-5 h-5" />
+                Consultar protocolo
+              </Button>
+            </Link>
           </div>
         </div>
       </section>
 
-      {/* ── SEÇÃO 3: Como Funciona ─────────────────────────────────────── */}
+      {/* ── SEÇÃO 3: Consultar protocolo (seção dedicada) ────────────────── */}
+      <section className="py-16 px-4" style={{ background: "#F8F8F8" }}>
+        <div className="max-w-3xl mx-auto text-center">
+          <h2 className="text-2xl font-bold mb-3" style={{ color: "#1351B4" }}>
+            Acompanhar manifestação
+          </h2>
+          <p className="text-[#6B6B6B] mb-6">
+            Já registrou uma demanda na ouvidoria? Insira o número do protocolo para acompanhar o andamento.
+          </p>
+          <Link href="/consultar-protocolo">
+            <Button size="lg" className="font-semibold px-8" variant="accent">
+              <Search className="w-4 h-4" />
+              Consultar Protocolo
+            </Button>
+          </Link>
+        </div>
+      </section>
+
+      {/* ── SEÇÃO 4: Como funciona ───────────────────────────────────────── */}
       <section className="py-16 px-4 bg-white" id="como-funciona">
         <div className="max-w-5xl mx-auto">
           <div className="text-center mb-12">
-            <h2
-              className="text-2xl sm:text-3xl font-bold mb-3"
-              style={{ color: "#1351B4" }}
-            >
+            <h2 className="text-2xl sm:text-3xl font-bold mb-3" style={{ color: "#1351B4" }}>
               Como funciona
             </h2>
             <p className="text-[#6B6B6B]">
@@ -267,30 +232,6 @@ export default function HomePage() {
                 <p className="text-xs text-[#6B6B6B] leading-relaxed">{passo.descricao}</p>
               </div>
             ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ── SEÇÃO 4: Garantias ─────────────────────────────────────────── */}
-      <section
-        style={{ background: "#1351B4" }}
-        className="py-12 px-4 text-white"
-      >
-        <div className="max-w-5xl mx-auto">
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-8 text-center">
-            {[
-              { icon: Clock,        text: "Prazo de resposta de até 20 dias úteis" },
-              { icon: Shield,       text: "Dados protegidos pela LGPD" },
-              { icon: CheckCircle,  text: "Serviço público gratuito" },
-            ].map((item) => {
-              const Icon = item.icon;
-              return (
-                <div key={item.text} className="flex flex-col items-center gap-3">
-                  <Icon className="w-8 h-8 opacity-90" />
-                  <p className="text-sm font-medium text-white/90">{item.text}</p>
-                </div>
-              );
-            })}
           </div>
         </div>
       </section>
