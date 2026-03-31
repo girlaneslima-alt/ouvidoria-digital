@@ -1,0 +1,272 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// ─── Auth.js padrão ───────────────────────────────────────────────────────────
+
+model User {
+  id            String    @id @default(cuid())
+  name          String?
+  email         String?   @unique
+  emailVerified DateTime?
+  image         String?
+  accounts      Account[]
+  sessions      Session[]
+
+  cidadao       Cidadao?
+  perfilInterno PerfilInterno?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.Text
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
+
+// ─── Cidadão ──────────────────────────────────────────────────────────────────
+
+model Cidadao {
+  id             String     @id @default(cuid())
+  userId         String     @unique
+  user           User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  estrangeiro    Boolean    @default(false)
+  tipoPessoa     TipoPessoa @default(FISICA)
+  cpf            String?    @unique
+  naoTemCpf      Boolean    @default(false)
+  nomeCompleto   String
+  nomeSocial     String?
+  nomeMae        String?
+  dataNascimento DateTime?
+  telefone       String?
+  cep            String?
+  endereco       String?
+  municipio      String?
+  uf             String?
+
+  manifestacoes Manifestacao[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+enum TipoPessoa {
+  FISICA
+  JURIDICA
+}
+
+// ─── Unidade / Órgão ──────────────────────────────────────────────────────────
+
+model Unidade {
+  id              String          @id @default(cuid())
+  nome            String
+  sigla           String?
+  tipo            TipoUnidade
+  municipio       String?
+  uf              String?
+  nivelFederativo NivelFederativo
+  email           String?
+  telefone        String?
+  ativa           Boolean         @default(true)
+
+  perfisInternos         PerfilInterno[]
+  manifestacoesOrigem    Manifestacao[]   @relation("UnidadeOrigem")
+  encaminhamentosDestino Encaminhamento[] @relation("UnidadeDestino")
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+enum TipoUnidade {
+  OUVIDORIA
+  PONTO_ATENDIMENTO
+  ORGAO_COMPETENTE
+}
+
+enum NivelFederativo {
+  FEDERAL
+  ESTADUAL
+  MUNICIPAL
+}
+
+// ─── Perfil Interno ───────────────────────────────────────────────────────────
+
+model PerfilInterno {
+  id        String       @id @default(cuid())
+  userId    String       @unique
+  user      User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  unidadeId String
+  unidade   Unidade      @relation(fields: [unidadeId], references: [id])
+  papel     PapelInterno
+
+  encaminhamentos Encaminhamento[]
+  respostas       Resposta[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+enum PapelInterno {
+  ATENDENTE
+  OUVIDOR
+  GESTOR
+  ADMIN
+}
+
+// ─── Manifestação ─────────────────────────────────────────────────────────────
+
+model Manifestacao {
+  id              String             @id @default(cuid())
+  protocolo       String             @unique
+  tipo            TipoManifestacao
+  assunto         String
+  descricao       String             @db.Text
+  status          StatusManifestacao @default(REGISTRADA)
+  sigiloso        Boolean            @default(false)
+  canalEntrada    CanalEntrada       @default(WEB)
+
+  cidadaoId       String
+  cidadao         Cidadao            @relation(fields: [cidadaoId], references: [id])
+  unidadeOrigemId String?
+  unidadeOrigem   Unidade?           @relation("UnidadeOrigem", fields: [unidadeOrigemId], references: [id])
+
+  prazoLegal       DateTime?
+  dataResposta     DateTime?
+  dataEncerramento DateTime?
+  protocoloFalaBR  String?
+
+  encaminhamentos Encaminhamento[]
+  respostas       Resposta[]
+  prazo           Prazo?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+enum TipoManifestacao {
+  DENUNCIA
+  ELOGIO
+  SOLICITACAO
+  SUGESTAO
+  SIMPLIFIQUE
+  INFORMACAO
+  RECLAMACAO
+}
+
+enum StatusManifestacao {
+  REGISTRADA
+  EM_ANALISE
+  ENCAMINHADA
+  AGUARDANDO_RESPOSTA
+  RESPONDIDA
+  ENCERRADA
+  CANCELADA
+}
+
+enum CanalEntrada {
+  WEB
+  APP
+  PRESENCIAL
+  TELEFONE
+  CARTA
+  FALA_BR
+}
+
+// ─── Encaminhamento ───────────────────────────────────────────────────────────
+
+model Encaminhamento {
+  id               String             @id @default(cuid())
+  manifestacaoId   String
+  manifestacao     Manifestacao       @relation(fields: [manifestacaoId], references: [id])
+  unidadeDestinoId String
+  unidadeDestino   Unidade            @relation("UnidadeDestino", fields: [unidadeDestinoId], references: [id])
+  responsavelId    String?
+  responsavel      PerfilInterno?     @relation(fields: [responsavelId], references: [id])
+  justificativa    String?            @db.Text
+  tipo             TipoEncaminhamento @default(INTERNO)
+
+  createdAt DateTime @default(now())
+}
+
+enum TipoEncaminhamento {
+  INTERNO
+  EXTERNO
+  REDE_NACIONAL
+}
+
+// ─── Resposta ─────────────────────────────────────────────────────────────────
+
+model Resposta {
+  id             String        @id @default(cuid())
+  manifestacaoId String
+  manifestacao   Manifestacao  @relation(fields: [manifestacaoId], references: [id])
+  responsavelId  String?
+  responsavel    PerfilInterno? @relation(fields: [responsavelId], references: [id])
+  conteudo       String        @db.Text
+  tipo           TipoResposta  @default(PARCIAL)
+  visivelCidadao Boolean       @default(true)
+
+  createdAt DateTime @default(now())
+}
+
+enum TipoResposta {
+  TECNICA
+  PARCIAL
+  FINAL
+}
+
+// ─── Prazo ────────────────────────────────────────────────────────────────────
+
+model Prazo {
+  id             String      @id @default(cuid())
+  manifestacaoId String      @unique
+  manifestacao   Manifestacao @relation(fields: [manifestacaoId], references: [id])
+  dataLimite     DateTime
+  alertasEnviados Int        @default(0)
+  statusPrazo    StatusPrazo @default(NO_PRAZO)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+enum StatusPrazo {
+  NO_PRAZO
+  ATRASADO
+  ENCERRADO
+}
