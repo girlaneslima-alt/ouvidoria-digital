@@ -22,88 +22,97 @@ interface Square {
   alt: string;
 }
 
-// ── Cidadãos brasileiros — diversidade de gênero, raça, idade e contexto ──
-// Todas as imagens são do Unsplash (licença gratuita para uso)
+// ── Cidadãos brasileiros — fotos locais com diversidade de gênero, raça e idade ──
 const squareData: Square[] = [
   {
     id: 1,
-    src: "https://images.unsplash.com/photo-1531482615713-2afd69097998?auto=format&fit=crop&w=400&q=80",
-    alt: "Cidadã brasileira em ambiente urbano",
+    src: "/cidadaos/mulher-negra.avif",
+    alt: "Mulher negra brasileira",
   },
   {
     id: 2,
-    src: "https://images.unsplash.com/photo-1596495577886-d920f1fb7238?auto=format&fit=crop&w=400&q=80",
-    alt: "Mulher jovem com smartphone",
+    src: "/cidadaos/mulher-negra-2.avif",
+    alt: "Mulher negra brasileira sorrindo",
   },
   {
     id: 3,
-    src: "https://images.unsplash.com/photo-1529626455594-4ff0802cfb7e?auto=format&fit=crop&w=400&q=80",
-    alt: "Mulher negra sorrindo com celular",
+    src: "/cidadaos/mulher-negra-3.avif",
+    alt: "Mulher negra jovem",
   },
   {
     id: 4,
-    src: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=400&q=80",
-    alt: "Homem adulto usando smartphone",
+    src: "/cidadaos/mulher-branca.avif",
+    alt: "Mulher branca brasileira",
   },
   {
     id: 5,
-    src: "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&w=400&q=80",
-    alt: "Homem jovem ao ar livre",
+    src: "/cidadaos/mulher-branca-2.avif",
+    alt: "Mulher branca jovem",
   },
   {
     id: 6,
-    src: "https://images.unsplash.com/photo-1547347298-4074fc3086f0?auto=format&fit=crop&w=400&q=80",
-    alt: "Pessoa correndo em parque urbano",
+    src: "/cidadaos/mulher-branca-3.avif",
+    alt: "Mulher branca sorrindo",
   },
   {
     id: 7,
-    src: "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=400&q=80",
-    alt: "Mulher profissional com tablet",
+    src: "/cidadaos/homem-negro-1.avif",
+    alt: "Homem negro brasileiro",
   },
   {
     id: 8,
-    src: "https://images.unsplash.com/photo-1560250097-0b93528c311a?auto=format&fit=crop&w=400&q=80",
-    alt: "Homem de negócios com smartphone",
+    src: "/cidadaos/homem-negro-2.avif",
+    alt: "Homem negro jovem",
   },
   {
     id: 9,
-    src: "https://images.unsplash.com/photo-1552374196-c4e7ffc6e126?auto=format&fit=crop&w=400&q=80",
-    alt: "Homem jovem em ambiente urbano",
+    src: "/cidadaos/homem-expressivo.avif",
+    alt: "Homem fazendo gestos expressivos",
   },
   {
     id: 10,
-    src: "https://images.unsplash.com/photo-1580489944761-15a19d654956?auto=format&fit=crop&w=400&q=80",
-    alt: "Mulher jovem sorrindo",
+    src: "/cidadaos/idosa-negra-1.avif",
+    alt: "Idosa negra brasileira",
   },
   {
     id: 11,
-    src: "https://images.unsplash.com/photo-1499996860823-5214fcc65f8f?auto=format&fit=crop&w=400&q=80",
-    alt: "Casal utilizando celular",
+    src: "/cidadaos/idosa-negra-2.avif",
+    alt: "Idosa negra sorrindo",
   },
   {
     id: 12,
-    src: "https://images.unsplash.com/photo-1617627143750-d86bc21e42bb?auto=format&fit=crop&w=400&q=80",
-    alt: "Jovem com smartphone em ambiente público",
+    src: "/cidadaos/idoso-branco.avif",
+    alt: "Idoso branco brasileiro",
   },
   {
     id: 13,
-    src: "https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=400&q=80",
-    alt: "Mulher adulta usando celular",
+    src: "/cidadaos/idoso-branco-1.avif",
+    alt: "Idoso branco com celular",
   },
   {
     id: 14,
-    src: "https://images.unsplash.com/photo-1553272725-086100aecf5e?auto=format&fit=crop&w=400&q=80",
-    alt: "Pessoa em atendimento público",
+    src: "/cidadaos/idoso-negro-1.avif",
+    alt: "Idoso negro brasileiro",
   },
   {
     id: 15,
-    src: "https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&w=400&q=80",
-    alt: "Idosa em atendimento",
+    src: "/cidadaos/idoso-celular.jpg",
+    alt: "Idoso acessando serviços pelo celular",
   },
   {
     id: 16,
-    src: "https://images.unsplash.com/photo-1521566652839-697aa473761a?auto=format&fit=crop&w=400&q=80",
-    alt: "Adolescente com smartphone",
+    src: "/cidadaos/indigena-guarani.jpg",
+    alt: "Cidadão indígena da etnia Guarani",
+  },
+  {
+    id: 17,
+    src: "/cidadaos/pessoa-lgbtq.avif",
+    alt: "Pessoa comemorando diversidade",
+  },
+  {
+    id: 18,
+    src: "/cidadaos/idoso-negro-2.avif",
+    alt: "Idoso negro sorrindo",
   },
 ];
 
@@ -119,7 +128,7 @@ const shuffle = (array: Square[]): Square[] => {
 };
 
 const generateSquares = () =>
-  shuffle(squareData).map((sq) => (
+  shuffle(squareData).slice(0, 16).map((sq) => (
     <motion.div
       key={sq.id}
       layout
