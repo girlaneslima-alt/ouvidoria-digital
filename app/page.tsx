@@ -2,6 +2,7 @@ import Link from "next/link";
 import { Navbar } from "@/components/layout/navbar";
 import { Footer } from "@/components/layout/footer";
 import { Button } from "@/components/ui/button";
+import { SpotlightCard } from "@/components/ui/spotlight-card";
 import {
   AlertTriangle,
   ThumbsUp,
@@ -14,57 +15,65 @@ import {
   Clock,
   Shield,
   CheckCircle,
+  ArrowRight,
 } from "lucide-react";
 
 const TIPOS = [
   {
     icon: AlertTriangle,
     label: "Denúncia",
-    descricao: "Comunicar irregularidade na administração pública.",
+    descricao: "Comunique irregularidades ou ilegalidades praticadas por agentes públicos.",
     cor: "#E52207",
     bg: "#FCDBD8",
+    spotlightColor: "#E5220718",
   },
   {
     icon: ThumbsUp,
     label: "Elogio",
-    descricao: "Registrar satisfação com o atendimento ou serviço.",
+    descricao: "Registre sua satisfação com um atendimento ou serviço recebido.",
     cor: "#168821",
     bg: "#DAF0DD",
+    spotlightColor: "#16882118",
   },
   {
     icon: FileText,
     label: "Solicitação",
-    descricao: "Pedir a realização de um serviço público.",
+    descricao: "Solicite a realização de um serviço público ao qual você tem direito.",
     cor: "#1351B4",
     bg: "#D4E6FF",
+    spotlightColor: "#1351B418",
   },
   {
     icon: Lightbulb,
     label: "Sugestão",
-    descricao: "Sugerir melhorias nos serviços e atendimentos.",
+    descricao: "Proponha melhorias nos serviços, atendimentos e processos públicos.",
     cor: "#9B59B6",
     bg: "#F3E8FF",
+    spotlightColor: "#9B59B618",
   },
   {
     icon: Layers,
     label: "Simplifique",
-    descricao: "Solicitar a simplificação de serviços ou processos públicos.",
+    descricao: "Sugira a simplificação de exigências ou processos burocráticos.",
     cor: "#17A2B8",
     bg: "#D4F4F9",
+    spotlightColor: "#17A2B818",
   },
   {
     icon: Info,
     label: "Informação",
-    descricao: "Solicitar informações sobre ações, serviços, programas, benefícios.",
+    descricao: "Solicite informações sobre programas, benefícios, serviços e ações.",
     cor: "#E06200",
     bg: "#FDE8D4",
+    spotlightColor: "#E0620018",
   },
   {
     icon: ThumbsDown,
     label: "Reclamação",
-    descricao: "Registrar insatisfação com serviço, programa ou atendimento público.",
+    descricao: "Manifeste insatisfação com um serviço, programa ou atendimento público.",
     cor: "#C0392B",
     bg: "#FCDBD8",
+    spotlightColor: "#C0392B18",
   },
 ];
 
@@ -90,6 +99,10 @@ const PASSOS = [
     descricao: "Prazo de até 20 dias úteis para resposta da ouvidoria.",
   },
 ];
+
+// Grid 4+3: first 4 in a 4-col row, last 3 centered in a 3-col row
+const TIPOS_ROW1 = TIPOS.slice(0, 4);
+const TIPOS_ROW2 = TIPOS.slice(4);
 
 export default function HomePage() {
   return (
@@ -140,42 +153,119 @@ export default function HomePage() {
       </section>
 
       {/* ── Tipos de Manifestação ─────────────────────────────────────────── */}
-      <section className="py-16 px-4 bg-white" id="manifestacoes">
+      <section
+        className="py-20 px-4"
+        style={{ background: "linear-gradient(180deg, #F8F9FC 0%, #FFFFFF 100%)" }}
+        id="manifestacoes"
+      >
         <div className="max-w-6xl mx-auto">
-          <div className="text-center mb-12">
-            <h2
-              className="text-2xl sm:text-3xl font-bold mb-3"
-              style={{ color: "#1351B4" }}
+
+          {/* Section header */}
+          <div className="text-center mb-14">
+            <span
+              className="inline-block text-xs font-semibold uppercase tracking-widest px-3 py-1 rounded-full mb-4"
+              style={{ background: "#D4E6FF", color: "#1351B4" }}
             >
-              O que você quer fazer?
+              Tipos de manifestação
+            </span>
+            <h2 className="text-3xl sm:text-4xl font-bold mb-4 text-[#1B1B1B]">
+              O que você quer{" "}
+              <span style={{ color: "#1351B4" }}>fazer hoje?</span>
             </h2>
-            <p className="text-muted-foreground">
-              Selecione o tipo de manifestação que melhor representa sua situação.
+            <p className="text-base text-[#6B6B6B] max-w-xl mx-auto leading-relaxed">
+              Escolha o tipo de manifestação que melhor descreve sua situação.
+              Todos os canais são gratuitos e têm prazo legal de resposta.
             </p>
           </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-            {TIPOS.map((tipo) => {
+
+          {/* Row 1 — 4 cards */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+            {TIPOS_ROW1.map((tipo) => {
               const Icon = tipo.icon;
               return (
-                <Link href="/login" key={tipo.label}>
-                  <div className="border border-border rounded-xl p-5 bg-white hover:shadow-md transition-all cursor-pointer group h-full">
+                <Link href="/login" key={tipo.label} className="group h-full">
+                  <SpotlightCard
+                    spotlightColor={tipo.spotlightColor}
+                    className="h-full rounded-2xl border border-[#E8EAF0] bg-white shadow-sm hover:shadow-lg hover:-translate-y-1 transition-all duration-300 p-6 flex flex-col"
+                  >
+                    {/* Icon badge */}
                     <div
-                      className="w-12 h-12 rounded-lg flex items-center justify-center mb-4"
+                      className="w-14 h-14 rounded-xl flex items-center justify-center mb-5 transition-transform duration-300 group-hover:scale-110"
                       style={{ background: tipo.bg }}
                     >
-                      <Icon className="w-6 h-6" style={{ color: tipo.cor }} />
+                      <Icon className="w-7 h-7" style={{ color: tipo.cor }} />
                     </div>
-                    <h3 className="font-semibold text-sm mb-1">{tipo.label}</h3>
-                    <p className="text-xs text-muted-foreground leading-relaxed">
-                      {tipo.descricao}
-                    </p>
-                  </div>
+
+                    {/* Text content */}
+                    <div className="flex-1">
+                      <h3 className="font-bold text-base text-[#1B1B1B] mb-2">
+                        {tipo.label}
+                      </h3>
+                      <p className="text-sm text-[#6B6B6B] leading-relaxed">
+                        {tipo.descricao}
+                      </p>
+                    </div>
+
+                    {/* CTA link */}
+                    <div
+                      className="mt-5 flex items-center gap-1 text-sm font-semibold transition-gap duration-200"
+                      style={{ color: tipo.cor }}
+                    >
+                      <span>Registrar</span>
+                      <ArrowRight className="w-4 h-4 transition-transform duration-200 group-hover:translate-x-1" />
+                    </div>
+                  </SpotlightCard>
                 </Link>
               );
             })}
           </div>
-          <p className="text-center text-sm text-muted-foreground mt-6 italic">
-            Se tiver dúvidas, passe o mouse ou toque no ícone para ver exemplos de cada opção.
+
+          {/* Row 2 — 3 cards centered (matching 3 of 4 columns width) */}
+          <div className="mt-5 grid grid-cols-1 sm:grid-cols-3 gap-5 lg:w-[calc(75%-0.375rem)] lg:mx-auto">
+            {TIPOS_ROW2.map((tipo) => {
+              const Icon = tipo.icon;
+              return (
+                <Link href="/login" key={tipo.label} className="group h-full">
+                  <SpotlightCard
+                    spotlightColor={tipo.spotlightColor}
+                    className="h-full rounded-2xl border border-[#E8EAF0] bg-white shadow-sm hover:shadow-lg hover:-translate-y-1 transition-all duration-300 p-6 flex flex-col"
+                  >
+                    {/* Icon badge */}
+                    <div
+                      className="w-14 h-14 rounded-xl flex items-center justify-center mb-5 transition-transform duration-300 group-hover:scale-110"
+                      style={{ background: tipo.bg }}
+                    >
+                      <Icon className="w-7 h-7" style={{ color: tipo.cor }} />
+                    </div>
+
+                    {/* Text content */}
+                    <div className="flex-1">
+                      <h3 className="font-bold text-base text-[#1B1B1B] mb-2">
+                        {tipo.label}
+                      </h3>
+                      <p className="text-sm text-[#6B6B6B] leading-relaxed">
+                        {tipo.descricao}
+                      </p>
+                    </div>
+
+                    {/* CTA link */}
+                    <div
+                      className="mt-5 flex items-center gap-1 text-sm font-semibold"
+                      style={{ color: tipo.cor }}
+                    >
+                      <span>Registrar</span>
+                      <ArrowRight className="w-4 h-4 transition-transform duration-200 group-hover:translate-x-1" />
+                    </div>
+                  </SpotlightCard>
+                </Link>
+              );
+            })}
+          </div>
+
+          {/* Bottom note */}
+          <p className="text-center text-sm text-[#6B6B6B] mt-10">
+            Prazo legal de até{" "}
+            <strong className="text-[#1351B4]">20 dias úteis</strong> para resposta · Serviço 100% gratuito
           </p>
         </div>
       </section>
