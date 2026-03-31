@@ -39,120 +39,222 @@
   --color-popover: var(--popover);
   --color-card-foreground: var(--card-foreground);
   --color-card: var(--card);
-  --radius-sm: calc(var(--radius) * 0.6);
-  --radius-md: calc(var(--radius) * 0.8);
-  --radius-lg: var(--radius);
-  --radius-xl: calc(var(--radius) * 1.4);
-  --radius-2xl: calc(var(--radius) * 1.8);
-  --radius-3xl: calc(var(--radius) * 2.2);
-  --radius-4xl: calc(var(--radius) * 2.6);
+
+  /* ── DSGOV Surface Rounder tokens ── */
+  --radius-none: 0px;
+  --radius-sm: 4px;         /* --surface-rounder-sm  */
+  --radius-md: 8px;         /* --surface-rounder-md  */
+  --radius-lg: 16px;        /* --surface-rounder-lg  */
+  --radius-pill: 100px;     /* --surface-rounder-pill (botões GOV.BR) */
 }
 
-/* ── Design Tokens Ouvidoria Digital — padrão GOV.BR ── */
+/* ─────────────────────────────────────────────────────────────────────────
+   DSGOV — Design System do Governo Federal (v3.x)
+   Fonte: https://www.gov.br/ds/fundamentos-visuais
+   Fonte tipográfica: Rawline → Raleway (fallback oficial) → sans-serif
+   ───────────────────────────────────────────────────────────────────────── */
 :root {
-  /* Primária */
-  --primary: #1351B4;
-  --primary-foreground: #FFFFFF;
+  /* ── Tipografia DSGOV ───────────────────────────────────────────────── */
+  --font-family-base: var(--font-sans), "Raleway", sans-serif;
+  --font-size-base: 14px;           /* base DSGOV */
+  --font-size-scale: 1.2;           /* escala modular 1.2x */
 
-  /* Fundo e texto */
-  --background: #F8F8F8;
-  --foreground: #1B1B1B;
+  /* Escala tipográfica DSGOV (base 14px × 1.2^n) */
+  --font-size-down-1: 11.662px;
+  --font-size-base:   14px;
+  --font-size-up-1:   16.8px;
+  --font-size-up-2:   20.16px;
+  --font-size-up-3:   24.19px;
+  --font-size-up-4:   29.03px;
+  --font-size-up-5:   34.83px;
+  --font-size-up-6:   41.80px;
+  --font-size-up-7:   50.16px;
 
-  /* Card e popover */
-  --card: #FFFFFF;
-  --card-foreground: #1B1B1B;
-  --popover: #FFFFFF;
-  --popover-foreground: #1B1B1B;
+  /* Pesos tipográficos */
+  --font-weight-light:    300;
+  --font-weight-regular:  400;
+  --font-weight-medium:   500;
+  --font-weight-semibold: 600;
+  --font-weight-bold:     700;
+  --font-weight-extrabold: 800;
 
-  /* Secundária */
-  --secondary: #F0F0F0;
-  --secondary-foreground: #1B1B1B;
+  /* Altura de linha */
+  --line-height-low:    1.15;
+  --line-height-medium: 1.45;  /* padrão DSGOV */
+  --line-height-high:   1.85;
 
-  /* Muted */
-  --muted: #F0F0F0;
-  --muted-foreground: #6B6B6B;
+  /* ── Espaçamento DSGOV (grid de 8px) ────────────────────────────────── */
+  --spacing-base: 8px;
+  --spacing-half: 4px;
+  --spacing-2x:  16px;
+  --spacing-3x:  24px;
+  --spacing-4x:  32px;
+  --spacing-6x:  48px;
+  --spacing-8x:  64px;
 
-  /* Acento (amarelo GOV.BR) */
-  --accent: #FFCD07;
-  --accent-foreground: #1B1B1B;
+  /* ── Paleta de cores DSGOV ───────────────────────────────────────────── */
 
-  /* Destrutivo */
-  --destructive: #E52207;
+  /* Azul primário GOV.BR */
+  --color-primary-default:  #1351b4;  /* blue-warm-vivid-50 */
+  --color-primary-dark:     #0c326f;  /* blue-warm-vivid-70 */
+  --color-primary-darker:   #071d41;  /* blue-warm-vivid-90 — sidebar */
+  --color-primary-light:    #d4e0ee;  /* blue-warm-vivid-10 */
+  --color-primary-lighter:  #dbe8fb;  /* blue-warm-vivid-5  */
 
-  /* Bordas e inputs */
-  --border: #CCCCCC;
-  --input: #CCCCCC;
-  --ring: #1351B4;
+  /* Verde sucesso */
+  --color-success-default:  #168821;  /* green-cool-vivid-50 */
+  --color-success-dark:     #0f6518;  /* green-cool-vivid-60 */
+  --color-success-light:    #e3f5e1;  /* green-cool-vivid-5  */
 
-  /* Radius */
-  --radius: 0.5rem;
+  /* Amarelo destaque */
+  --color-warning-default:  #ffcd07;  /* yellow-vivid-20 */
+  --color-warning-dark:     #d4a017;  /* yellow-vivid-30 */
+  --color-warning-light:    #fff5c2;  /* yellow-vivid-5  */
 
-  /* Sidebar (azul escuro institucional) */
-  --sidebar: #071D41;
-  --sidebar-foreground: #FFFFFF;
-  --sidebar-primary: #1351B4;
-  --sidebar-primary-foreground: #FFFFFF;
-  --sidebar-accent: #1351B4;
-  --sidebar-accent-foreground: #FFFFFF;
-  --sidebar-border: #0D3F8F;
-  --sidebar-ring: #1351B4;
+  /* Vermelho erro */
+  --color-danger-default:   #e52207;  /* red-vivid-50 */
+  --color-danger-dark:      #c01a05;  /* red-vivid-60 */
+  --color-danger-light:     #fde0db;  /* red-vivid-10 */
 
-  /* Charts */
-  --chart-1: #1351B4;
-  --chart-2: #168821;
-  --chart-3: #E06200;
-  --chart-4: #9B59B6;
-  --chart-5: #E52207;
+  /* Foco (ouro) */
+  --color-focus:            #c2850c;  /* gold-vivid-40 */
 
-  /* Custom — sucesso e aviso */
-  --success: #168821;
-  --success-foreground: #FFFFFF;
-  --warning: #E06200;
-  --warning-foreground: #FFFFFF;
+  /* Cinzas neutros */
+  --color-gray-5:  #f8f8f8;
+  --color-gray-10: #f0f0f0;
+  --color-gray-20: #e0e0e0;
+  --color-gray-40: #cccccc;
+  --color-gray-60: #9e9e9e;
+  --color-gray-80: #6b6b6b;
+  --color-gray-90: #333333;
+  --color-gray-100:#1b1b1b;
+
+  /* ── Mapeamento para tokens shadcn/ui ───────────────────────────────── */
+  --primary:             var(--color-primary-default);
+  --primary-foreground:  #ffffff;
+
+  --background:          var(--color-gray-5);
+  --foreground:          var(--color-gray-100);
+
+  --card:                #ffffff;
+  --card-foreground:     var(--color-gray-100);
+
+  --popover:             #ffffff;
+  --popover-foreground:  var(--color-gray-100);
+
+  --secondary:           var(--color-gray-10);
+  --secondary-foreground: var(--color-gray-100);
+
+  --muted:               var(--color-gray-10);
+  --muted-foreground:    var(--color-gray-80);
+
+  --accent:              var(--color-warning-default);
+  --accent-foreground:   var(--color-gray-100);
+
+  --destructive:         var(--color-danger-default);
+  --destructive-foreground: #ffffff;
+
+  --border:              var(--color-gray-40);
+  --input:               var(--color-gray-40);
+  --ring:                var(--color-focus);  /* foco ouro GOV.BR */
+
+  /* ── Radius — baseado no DSGOV surface-rounder ──────────────────────── */
+  --radius: 8px;  /* padrão md — cards e inputs */
+
+  /* ── Sidebar institucional ──────────────────────────────────────────── */
+  --sidebar:                var(--color-primary-darker);
+  --sidebar-foreground:     #ffffff;
+  --sidebar-primary:        var(--color-primary-default);
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent:         var(--color-primary-default);
+  --sidebar-accent-foreground: #ffffff;
+  --sidebar-border:         var(--color-primary-dark);
+  --sidebar-ring:           var(--color-focus);
+
+  /* ── Charts ─────────────────────────────────────────────────────────── */
+  --chart-1: var(--color-primary-default);
+  --chart-2: var(--color-success-default);
+  --chart-3: #e06200;
+  --chart-4: #9b59b6;
+  --chart-5: var(--color-danger-default);
+
+  /* ── Sucesso / Aviso (custom tokens) ────────────────────────────────── */
+  --success:             var(--color-success-default);
+  --success-foreground:  #ffffff;
+  --warning:             #e06200;
+  --warning-foreground:  #ffffff;
 }
 
+/* ── Dark mode — mantido para compatibilidade ───────────────────────────── */
 .dark {
-  --background: oklch(0.145 0 0);
-  --foreground: oklch(0.985 0 0);
-  --card: oklch(0.205 0 0);
-  --card-foreground: oklch(0.985 0 0);
-  --popover: oklch(0.205 0 0);
-  --popover-foreground: oklch(0.985 0 0);
-  --primary: oklch(0.922 0 0);
-  --primary-foreground: oklch(0.205 0 0);
-  --secondary: oklch(0.269 0 0);
-  --secondary-foreground: oklch(0.985 0 0);
-  --muted: oklch(0.269 0 0);
-  --muted-foreground: oklch(0.708 0 0);
-  --accent: oklch(0.269 0 0);
-  --accent-foreground: oklch(0.985 0 0);
-  --destructive: oklch(0.704 0.191 22.216);
-  --border: oklch(1 0 0 / 10%);
-  --input: oklch(1 0 0 / 15%);
-  --ring: oklch(0.556 0 0);
-  --chart-1: oklch(0.87 0 0);
-  --chart-2: oklch(0.556 0 0);
-  --chart-3: oklch(0.439 0 0);
-  --chart-4: oklch(0.371 0 0);
-  --chart-5: oklch(0.269 0 0);
-  --sidebar: oklch(0.205 0 0);
-  --sidebar-foreground: oklch(0.985 0 0);
-  --sidebar-primary: oklch(0.488 0.243 264.376);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.269 0 0);
-  --sidebar-accent-foreground: oklch(0.985 0 0);
-  --sidebar-border: oklch(1 0 0 / 10%);
-  --sidebar-ring: oklch(0.556 0 0);
+  --background:          #121212;
+  --foreground:          #f0f0f0;
+  --card:                #1e1e1e;
+  --card-foreground:     #f0f0f0;
+  --popover:             #1e1e1e;
+  --popover-foreground:  #f0f0f0;
+  --primary:             #4b86e8;
+  --primary-foreground:  #071d41;
+  --secondary:           #2c2c2c;
+  --secondary-foreground: #f0f0f0;
+  --muted:               #2c2c2c;
+  --muted-foreground:    #9e9e9e;
+  --accent:              #ffcd07;
+  --accent-foreground:   #1b1b1b;
+  --destructive:         #ff6b57;
+  --border:              rgba(255, 255, 255, 0.12);
+  --input:               rgba(255, 255, 255, 0.15);
+  --ring:                #c2850c;
+  --chart-1:             #4b86e8;
+  --chart-2:             #2ecc71;
+  --chart-3:             #f39c12;
+  --chart-4:             #9b59b6;
+  --chart-5:             #e74c3c;
+  --sidebar:             #1e1e1e;
+  --sidebar-foreground:  #f0f0f0;
+  --sidebar-primary:     #4b86e8;
+  --sidebar-primary-foreground: #f0f0f0;
+  --sidebar-accent:      #2c2c2c;
+  --sidebar-accent-foreground: #f0f0f0;
+  --sidebar-border:      rgba(255,255,255,0.08);
+  --sidebar-ring:        #c2850c;
 }
 
+/* ── Base layer ─────────────────────────────────────────────────────────── */
 @layer base {
   * {
     @apply border-border outline-ring/50;
   }
+
   body {
     @apply bg-background text-foreground;
+    font-family: var(--font-family-base);
+    font-size: var(--font-size-base);
+    line-height: var(--line-height-medium);
   }
+
   html {
     @apply font-sans;
+    font-size: 14px; /* base DSGOV */
+  }
+
+  /* Heading defaults — Rawline/Raleway semibold e bold */
+  h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-family-base);
+    font-weight: var(--font-weight-semibold);
+    line-height: var(--line-height-low);
+    color: var(--color-gray-100);
+  }
+
+  /* Foco acessível — padrão DSGOV (ouro) */
+  :focus-visible {
+    outline: 3px solid var(--color-focus);
+    outline-offset: 2px;
+    border-radius: var(--radius-sm);
+  }
+
+  /* Smooth scroll */
+  html {
+    scroll-behavior: smooth;
   }
 }

@@ -1,10 +1,18 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
+import { Raleway } from "next/font/google";
 import "./globals.css";
 import { Toaster } from "sonner";
 import { Providers } from "@/components/providers";
 
-const inter = Inter({ subsets: ["latin"], variable: "--font-sans" });
+// Raleway é a fonte oficial de fallback do padrão GOV.BR (Rawline → Raleway → sans-serif)
+// Rawline é a fonte primária do DSGOV mas não está disponível via Google Fonts;
+// Raleway é visualmente idêntica e reconhecida como substituta oficial.
+const rawline = Raleway({
+  subsets: ["latin"],
+  variable: "--font-sans",
+  weight: ["300", "400", "500", "600", "700", "800"],
+  display: "swap",
+});
 
 export const metadata: Metadata = {
   title: "Ouvidoria Digital — MDS",
@@ -19,7 +27,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="pt-BR" className={`${inter.variable} h-full`}>
+    <html lang="pt-BR" className={`${rawline.variable} h-full`}>
       <body className="min-h-full flex flex-col bg-background text-foreground antialiased">
         <Providers>
           {children}
