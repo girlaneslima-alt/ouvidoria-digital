@@ -257,4 +257,31 @@
   html {
     scroll-behavior: smooth;
   }
+
+  /* ── Herança de fonte para elementos de formulário ──────────────────────
+     Browsers não herdam font-family/size em input, select e textarea por
+     padrão — isso causa a inconsistência de fonte nos campos.               */
+  input,
+  select,
+  textarea,
+  button {
+    font-family: var(--font-family-base);
+    font-size:   var(--font-size-base);
+    line-height: var(--line-height-medium);
+  }
+
+  /* ── Sobrescrever o fundo azul/amarelo do autofill do browser ───────────
+     Quando o browser preenche automaticamente (ou o ViaCEP via setValue),
+     aplica background próprio. Forçamos branco + cor do texto DSGOV.        */
+  input:-webkit-autofill,
+  input:-webkit-autofill:hover,
+  input:-webkit-autofill:focus,
+  input:-webkit-autofill:active,
+  select:-webkit-autofill,
+  textarea:-webkit-autofill {
+    -webkit-box-shadow: 0 0 0px 1000px #ffffff inset !important;
+    -webkit-text-fill-color: #1b1b1b !important;
+    caret-color: #1b1b1b;
+    transition: background-color 9999s ease-in-out 0s;
+  }
 }
