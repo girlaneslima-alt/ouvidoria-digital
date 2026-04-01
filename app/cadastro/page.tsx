@@ -234,12 +234,12 @@ export default function CadastroPage() {
                   Você é estrangeiro? <span className="text-red-500">*</span>
                 </p>
                 <div className="flex gap-4">
-                  {[{ label: "Sim", val: "true" }, { label: "Não", val: "false" }].map(({ label, val }) => (
-                    <label key={val} className="flex items-center gap-2 cursor-pointer">
+                  {[{ label: "Sim", bool: true }, { label: "Não", bool: false }].map(({ label, bool }) => (
+                    <label key={String(bool)} className="flex items-center gap-2 cursor-pointer">
                       <input
                         type="radio"
-                        value={val}
-                        {...register("estrangeiro", { setValueAs: (v) => v === "true" })}
+                        checked={estrangeiro === bool}
+                        onChange={() => setValue("estrangeiro", bool)}
                         className="w-4 h-4 accent-[#1351B4]"
                       />
                       <span className="text-sm">{label}</span>
