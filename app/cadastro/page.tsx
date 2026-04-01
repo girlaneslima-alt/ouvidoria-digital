@@ -5,13 +5,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Checkbox } from "@/components/ui/checkbox";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Separator } from "@/components/ui/separator";
-import { Eye, EyeOff, Search, AlertCircle, CheckCircle2 } from "lucide-react";
+import { Eye, EyeOff, Search, ArrowLeft, ChevronRight, User, Building2, Globe, MapPin, Phone, Lock, CheckCircle2 } from "lucide-react";
 import { toast } from "sonner";
 import { cadastroCidadaoSchema, type CadastroCidadaoInput } from "@/lib/validations";
 
@@ -20,12 +14,90 @@ const UFS = [
   "PA","PB","PE","PI","PR","RJ","RN","RO","RR","RS","SC","SE","SP","TO",
 ];
 
+// ── Helpers de estilo ────────────────────────────────────────────────────────
+
+function FieldError({ msg }: { msg?: string }) {
+  if (!msg) return null;
+  return <p className="text-xs text-red-600 mt-1">{msg}</p>;
+}
+
+function SectionCard({
+  icon,
+  title,
+  children,
+}: {
+  icon: React.ReactNode;
+  title: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <div className="bg-white rounded-2xl border border-[#E8EAF0] shadow-sm overflow-hidden">
+      <div className="flex items-center gap-3 px-6 py-4 border-b border-[#E8EAF0] bg-[#F5F8FF]">
+        <div className="w-8 h-8 rounded-lg bg-[#1351B4] flex items-center justify-center text-white">
+          {icon}
+        </div>
+        <h2 className="font-semibold text-[#1351B4] text-base">{title}</h2>
+      </div>
+      <div className="p-6 space-y-4">{children}</div>
+    </div>
+  );
+}
+
+function FieldRow({ children }: { children: React.ReactNode }) {
+  return <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">{children}</div>;
+}
+
+function FieldGroup({ label, required, error, children }: {
+  label: string; required?: boolean; error?: string; children: React.ReactNode;
+}) {
+  return (
+    <div className="space-y-1.5">
+      <label className="block text-sm font-medium text-[#1B1B1B]">
+        {label}{required && <span className="text-red-500 ml-0.5">*</span>}
+      </label>
+      {children}
+      <FieldError msg={error} />
+    </div>
+  );
+}
+
+function TextInput({
+  placeholder, error, fullWidth, ...props
+}: React.InputHTMLAttributes<HTMLInputElement> & { error?: string; fullWidth?: boolean }) {
+  return (
+    <input
+      placeholder={placeholder}
+      className={`w-full h-10 rounded-lg border px-3.5 text-sm text-[#1B1B1B] placeholder:text-[#AAAAAA]
+        focus:outline-none focus:ring-2 focus:ring-[#1351B4] focus:border-transparent transition
+        ${error ? "border-red-400 bg-red-50" : "border-[#CCCCCC]"}`}
+      {...props}
+    />
+  );
+}
+
+function SelectInput({
+  children, error, ...props
+}: React.SelectHTMLAttributes<HTMLSelectElement> & { error?: string }) {
+  return (
+    <select
+      className={`w-full h-10 rounded-lg border px-3.5 text-sm text-[#1B1B1B] bg-white
+        focus:outline-none focus:ring-2 focus:ring-[#1351B4] focus:border-transparent transition
+        ${error ? "border-red-400 bg-red-50" : "border-[#CCCCCC]"}`}
+      {...props}
+    >
+      {children}
+    </select>
+  );
+}
+
+// ── Componente principal ─────────────────────────────────────────────────────
+
 export default function CadastroPage() {
-  const router = useRouter();
-  const [mostrarSenha, setMostrarSenha] = useState(false);
+  const router                              = useRouter();
+  const [mostrarSenha, setMostrarSenha]     = useState(false);
   const [mostrarConfirmar, setMostrarConfirmar] = useState(false);
-  const [loading, setLoading] = useState(false);
-  const [buscandoCep, setBuscandoCep] = useState(false);
+  const [loading, setLoading]               = useState(false);
+  const [buscandoCep, setBuscandoCep]       = useState(false);
 
   const {
     register,
@@ -33,27 +105,26 @@ export default function CadastroPage() {
     watch,
     setValue,
     formState: { errors },
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } = useForm<CadastroCidadaoInput>({
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     resolver: zodResolver(cadastroCidadaoSchema) as any,
     defaultValues: {
       estrangeiro: false,
-      tipoPessoa: "FISICA",
-      naoTemCpf: false,
-      aceiteTermos: undefined,
+      tipoPessoa:  "FISICA",
+      naoTemCpf:   false,
     },
   });
 
   const estrangeiro = watch("estrangeiro");
-  const naoTemCpf = watch("naoTemCpf");
-  const senha = watch("senha") ?? "";
+  const tipoPessoa  = watch("tipoPessoa");
+  const naoTemCpf   = watch("naoTemCpf");
+  const senha       = watch("senha") ?? "";
 
-  // Requisitos de senha
   const senhaReqs = {
-    especial: /[!@#$%]/.test(senha),
+    tamanho:  senha.length >= 8,
     maiuscula: /[A-Z]/.test(senha),
-    igual: senha.length > 0 && senha === watch("confirmarSenha"),
-    tamanho: senha.length >= 8,
+    especial:  /[!@#$%]/.test(senha),
+    igual:     senha.length > 0 && senha === watch("confirmarSenha"),
   };
 
   async function buscarCep(cep: string) {
@@ -61,375 +132,471 @@ export default function CadastroPage() {
     if (limpo.length !== 8) return;
     setBuscandoCep(true);
     try {
-      const res = await fetch(`https://viacep.com.br/ws/${limpo}/json/`);
+      const res  = await fetch(`https://viacep.com.br/ws/${limpo}/json/`);
       const data = await res.json();
       if (!data.erro) {
-        setValue("endereco", `${data.logradouro}, ${data.bairro}`);
-        setValue("municipio", data.localidade);
-        setValue("uf", data.uf);
+        setValue("logradouro", data.logradouro);
+        setValue("bairro",     data.bairro);
+        setValue("cidade",     data.localidade);
+        setValue("municipio",  data.localidade);
+        setValue("estado",     data.uf);
+        setValue("uf",         data.uf);
       }
-    } catch {}
+    } catch { /* silencioso */ }
     setBuscandoCep(false);
   }
 
   async function onSubmit(data: CadastroCidadaoInput) {
     setLoading(true);
     try {
-      const res = await fetch("/api/auth/cadastro", {
-        method: "POST",
+      const res  = await fetch("/api/auth/cadastro", {
+        method:  "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data),
+        body:    JSON.stringify({
+          ...data,
+          endereco: `${data.logradouro ?? ""}, ${data.bairro ?? ""}`.trim().replace(/^,\s*/, ""),
+          municipio: data.cidade,
+        }),
       });
       const json = await res.json();
       if (!res.ok) throw new Error(json.error ?? "Erro ao cadastrar");
       toast.success("Cadastro realizado! Faça login para continuar.");
       router.push("/login");
-    } catch (err: any) {
-      toast.error(err.message);
+    } catch (err: unknown) {
+      toast.error(err instanceof Error ? err.message : "Erro inesperado");
     } finally {
       setLoading(false);
     }
   }
 
-  return (
-    <div className="min-h-screen flex flex-col" style={{ background: "#F8F8F8" }}>
-      {/* Barra GOV.BR */}
-      <div className="h-2 w-full" style={{ background: "#1351B4" }} />
+  // Tipo selecionado para exibição amigável
+  const tipoLabel = estrangeiro
+    ? "Estrangeiro"
+    : tipoPessoa === "JURIDICA"
+    ? "Pessoa Jurídica"
+    : "Pessoa Física";
 
-      {/* Header mínimo */}
-      <header className="bg-white border-b border-border">
-        <div className="max-w-7xl mx-auto px-4 h-14 flex items-center justify-between">
-          <Link href="/" className="flex items-center gap-2">
-            <div
-              className="w-8 h-8 rounded-lg flex items-center justify-center text-white font-bold text-xs"
-              style={{ background: "#1351B4" }}
-            >
-              OD
+  return (
+    <div className="min-h-screen flex flex-col bg-[#F0F4FF]">
+
+      {/* Barra GOV.BR */}
+      <div className="h-1.5 w-full bg-[#1351B4]" />
+
+      {/* Header */}
+      <header className="bg-white border-b border-[#E8EAF0]">
+        <div className="max-w-5xl mx-auto px-4 sm:px-6 h-14 flex items-center justify-between">
+          <Link href="/" className="flex items-center gap-2.5">
+            <div className="w-8 h-8 rounded-lg bg-[#1351B4] flex items-center justify-center">
+              <span className="text-white font-bold text-xs">OD</span>
             </div>
-            <span className="font-semibold text-sm" style={{ color: "#1351B4" }}>
-              Ouvidoria Digital
-            </span>
+            <span className="font-semibold text-sm text-[#1351B4]">Ouvidoria Digital</span>
           </Link>
-          <nav className="flex items-center gap-4 text-sm text-muted-foreground">
-            <Link href="/">Início</Link>
-            <span>›</span>
-            <Link href="/sobre">Sobre a Ouvidoria</Link>
-            <span>›</span>
-            <Link href="/perguntas-frequentes">Perguntas Frequentes</Link>
+          <nav className="hidden sm:flex items-center gap-1.5 text-xs text-[#6B6B6B]">
+            <Link href="/" className="hover:text-[#1351B4] transition-colors">Início</Link>
+            <ChevronRight className="w-3 h-3" />
+            <Link href="/login" className="hover:text-[#1351B4] transition-colors">Login</Link>
+            <ChevronRight className="w-3 h-3" />
+            <span className="text-[#1351B4] font-medium">Cadastro</span>
           </nav>
         </div>
       </header>
 
-      <main className="flex-1 px-4 pt-10 pb-20">
-        <div className="max-w-lg mx-auto">
+      {/* Main */}
+      <main className="flex-1 px-4 sm:px-6 pt-10 pb-20">
+        <div className="max-w-3xl mx-auto">
+
           {/* Voltar */}
-          <Link
-            href="/login"
-            className="inline-flex items-center gap-1 text-sm mb-6"
-            style={{ color: "#1351B4" }}
-          >
-            ← Voltar
+          <Link href="/login" className="inline-flex items-center gap-1.5 text-sm text-[#1351B4] hover:underline mb-6">
+            <ArrowLeft className="w-4 h-4" />
+            Voltar para o login
           </Link>
 
-          <Card className="border border-border shadow-sm">
-            <CardHeader className="pb-2">
-              <CardTitle className="text-xl" style={{ color: "#1351B4" }}>
-                Cadastra-se
-              </CardTitle>
-              <p className="text-sm text-muted-foreground mt-1">
-                Crie seu cadastro para registrar manifestações e acompanhar respostas da Ouvidoria do MDS.
-                O cadastro é rápido e gratuito.
-              </p>
-              <p className="text-xs text-muted-foreground mt-2 border-l-2 pl-3" style={{ borderColor: "#1351B4" }}>
-                Seus dados pessoais são protegidos conforme a Lei Geral de Proteção de Dados (LGPD).
-              </p>
-            </CardHeader>
+          {/* Heading */}
+          <div className="mb-8">
+            <h1 className="text-2xl sm:text-3xl font-bold text-[#1351B4] mb-2">Criar conta</h1>
+            <p className="text-sm text-[#6B6B6B] leading-relaxed">
+              Preencha os dados abaixo para registrar manifestações e acompanhar respostas.
+              Seus dados são protegidos pela{" "}
+              <a href="https://www.gov.br/lgpd" target="_blank" rel="noreferrer" className="text-[#1351B4] underline underline-offset-2">LGPD</a>.
+            </p>
+          </div>
 
-            <CardContent className="pt-4">
-              <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
+          <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
 
-                {/* Estrangeiro */}
-                <div className="space-y-2">
-                  <Label className="font-semibold">Você é estrangeiro?*</Label>
-                  <div className="flex items-center gap-6">
-                    {["Sim", "Não"].map((op) => (
-                      <label key={op} className="flex items-center gap-2 cursor-pointer">
-                        <input
-                          type="radio"
-                          value={op === "Sim" ? "true" : "false"}
-                          {...register("estrangeiro", {
-                            setValueAs: (v) => v === "true",
-                          })}
-                          className="w-4 h-4 accent-primary"
-                        />
-                        <span className="text-sm">{op}</span>
-                      </label>
-                    ))}
-                  </div>
+            {/* ══════════════════════════════════════════
+                CARD 0 — Tipo de demandante
+                ══════════════════════════════════════════ */}
+            <SectionCard icon={<User className="w-4 h-4" />} title="Tipo de demandante">
+
+              {/* Estrangeiro? */}
+              <div className="space-y-2">
+                <p className="text-sm font-medium text-[#1B1B1B]">
+                  Você é estrangeiro? <span className="text-red-500">*</span>
+                </p>
+                <div className="flex gap-4">
+                  {[{ label: "Sim", val: "true" }, { label: "Não", val: "false" }].map(({ label, val }) => (
+                    <label key={val} className="flex items-center gap-2 cursor-pointer">
+                      <input
+                        type="radio"
+                        value={val}
+                        {...register("estrangeiro", { setValueAs: (v) => v === "true" })}
+                        className="w-4 h-4 accent-[#1351B4]"
+                      />
+                      <span className="text-sm">{label}</span>
+                    </label>
+                  ))}
                 </div>
+              </div>
 
-                {/* Tipo de pessoa */}
-                <div className="space-y-2">
-                  <Label className="font-semibold">Tipo do pessoa*:</Label>
-                  <div className="flex items-center gap-6">
+              {/* Tipo de pessoa — só se NÃO for estrangeiro */}
+              {!estrangeiro && (
+                <div className="space-y-2 pt-2 border-t border-[#E8EAF0]">
+                  <p className="text-sm font-medium text-[#1B1B1B]">
+                    Tipo de pessoa <span className="text-red-500">*</span>
+                  </p>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     {[
-                      { label: "Pessoa Física", value: "FISICA" },
-                      { label: "Pessoa Jurídica", value: "JURIDICA" },
-                    ].map((op) => (
-                      <label key={op.value} className="flex items-center gap-2 cursor-pointer">
-                        <input
-                          type="radio"
-                          value={op.value}
-                          {...register("tipoPessoa")}
-                          className="w-4 h-4 accent-primary"
-                        />
-                        <span className="text-sm">{op.label}</span>
+                      { label: "Pessoa Física",   val: "FISICA",   icon: <User className="w-5 h-5" />,      desc: "CPF obrigatório" },
+                      { label: "Pessoa Jurídica", val: "JURIDICA", icon: <Building2 className="w-5 h-5" />, desc: "CNPJ obrigatório" },
+                    ].map(({ label, val, icon, desc }) => (
+                      <label
+                        key={val}
+                        className={`flex items-center gap-3 p-4 rounded-xl border-2 cursor-pointer transition-all
+                          ${tipoPessoa === val
+                            ? "border-[#1351B4] bg-[#EEF4FF]"
+                            : "border-[#E8EAF0] bg-white hover:border-[#1351B4]/40"}`}
+                      >
+                        <input type="radio" value={val} {...register("tipoPessoa")} className="sr-only" />
+                        <div className={`${tipoPessoa === val ? "text-[#1351B4]" : "text-[#6B6B6B]"}`}>{icon}</div>
+                        <div>
+                          <p className={`font-semibold text-sm ${tipoPessoa === val ? "text-[#1351B4]" : "text-[#1B1B1B]"}`}>{label}</p>
+                          <p className="text-xs text-[#6B6B6B]">{desc}</p>
+                        </div>
                       </label>
                     ))}
                   </div>
                 </div>
+              )}
 
-                {/* CPF */}
-                {!estrangeiro && (
-                  <div className="space-y-1.5">
-                    <Input
-                      placeholder="CPF"
+              {/* Badge do tipo selecionado */}
+              <div className="flex items-center gap-2 pt-2">
+                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#1351B4] text-white text-xs font-medium">
+                  {estrangeiro ? <Globe className="w-3 h-3" /> : tipoPessoa === "JURIDICA" ? <Building2 className="w-3 h-3" /> : <User className="w-3 h-3" />}
+                  Cadastrando como: {tipoLabel}
+                </span>
+              </div>
+            </SectionCard>
+
+            {/* ══════════════════════════════════════════
+                CARD 1 — Dados Pessoais
+                ══════════════════════════════════════════ */}
+            <SectionCard
+              icon={estrangeiro ? <Globe className="w-4 h-4" /> : tipoPessoa === "JURIDICA" ? <Building2 className="w-4 h-4" /> : <User className="w-4 h-4" />}
+              title="Dados Pessoais"
+            >
+
+              {/* ── PESSOA JURÍDICA ── */}
+              {!estrangeiro && tipoPessoa === "JURIDICA" && (
+                <>
+                  <FieldRow>
+                    <FieldGroup label="Nome do Representante Legal" required error={errors.nomeRepresentante?.message}>
+                      <TextInput placeholder="Digite aqui" {...register("nomeRepresentante")} error={errors.nomeRepresentante?.message} />
+                    </FieldGroup>
+                    <FieldGroup label="CPF do Representante Legal" required error={errors.cpfRepresentante?.message}>
+                      <TextInput placeholder="Digite aqui" {...register("cpfRepresentante")} maxLength={14} error={errors.cpfRepresentante?.message} />
+                    </FieldGroup>
+                  </FieldRow>
+                  <FieldGroup label="E-mail do Representante Legal" required error={errors.emailRepresentante?.message}>
+                    <TextInput type="email" placeholder="Digite aqui" {...register("emailRepresentante")} error={errors.emailRepresentante?.message} />
+                  </FieldGroup>
+                  <FieldRow>
+                    <FieldGroup label="Nome da Empresa" required error={errors.nomeEmpresa?.message}>
+                      <TextInput placeholder="Digite aqui" {...register("nomeEmpresa")} error={errors.nomeEmpresa?.message} />
+                    </FieldGroup>
+                    <FieldGroup label="CNPJ" required error={errors.cnpj?.message}>
+                      <TextInput placeholder="00.000.000/0000-00" {...register("cnpj")} maxLength={18} error={errors.cnpj?.message} />
+                    </FieldGroup>
+                  </FieldRow>
+                  <FieldGroup label="Contrato da Empresa" error={errors.contratoEmpresa?.message}>
+                    <TextInput placeholder="Número do contrato (opcional)" {...register("contratoEmpresa")} error={errors.contratoEmpresa?.message} />
+                  </FieldGroup>
+                </>
+              )}
+
+              {/* ── PESSOA FÍSICA ── */}
+              {!estrangeiro && tipoPessoa === "FISICA" && (
+                <>
+                  <FieldRow>
+                    <FieldGroup label="Nome Completo" required error={errors.nomeCompleto?.message}>
+                      <TextInput placeholder="Digite aqui" {...register("nomeCompleto")} error={errors.nomeCompleto?.message} />
+                    </FieldGroup>
+                    <FieldGroup label="Nome Social" error={errors.nomeSocial?.message}>
+                      <TextInput placeholder="Digite aqui (opcional)" {...register("nomeSocial")} />
+                    </FieldGroup>
+                  </FieldRow>
+                  <FieldRow>
+                    <FieldGroup label="Data de Nascimento" error={errors.dataNascimento?.message}>
+                      <TextInput type="date" {...register("dataNascimento")} />
+                    </FieldGroup>
+                    <FieldGroup label="Nome da Mãe" error={errors.nomeMae?.message}>
+                      <TextInput placeholder="Digite aqui" {...register("nomeMae")} />
+                    </FieldGroup>
+                  </FieldRow>
+                  <FieldGroup label="CPF" required={!naoTemCpf} error={errors.cpf?.message}>
+                    <TextInput
+                      placeholder="000.000.000-00"
                       {...register("cpf")}
                       disabled={naoTemCpf}
                       maxLength={14}
-                      className={errors.cpf ? "border-destructive" : ""}
+                      error={errors.cpf?.message}
                     />
-                    {errors.cpf && (
-                      <p className="text-xs text-destructive">{errors.cpf.message}</p>
-                    )}
-                    <label className="flex items-center gap-2 cursor-pointer mt-1">
-                      <Checkbox
+                    <label className="inline-flex items-center gap-2 mt-2 cursor-pointer">
+                      <input
+                        type="checkbox"
                         checked={naoTemCpf}
-                        onCheckedChange={(v) => setValue("naoTemCpf", !!v)}
+                        onChange={(e) => setValue("naoTemCpf", e.target.checked)}
+                        className="w-4 h-4 accent-[#1351B4] rounded"
                       />
-                      <span className="text-sm">Não possuo</span>
+                      <span className="text-xs text-[#6B6B6B]">Não possuo CPF</span>
                     </label>
-                  </div>
-                )}
+                  </FieldGroup>
+                </>
+              )}
 
-                {/* Nome Completo */}
-                <div className="space-y-1.5">
-                  <Input
-                    placeholder="Nome Completo*"
-                    {...register("nomeCompleto")}
-                    className={errors.nomeCompleto ? "border-destructive" : ""}
-                  />
-                  {errors.nomeCompleto && (
-                    <p className="text-xs text-destructive">{errors.nomeCompleto.message}</p>
-                  )}
-                </div>
+              {/* ── ESTRANGEIRO ── */}
+              {estrangeiro && (
+                <>
+                  <FieldRow>
+                    <FieldGroup label="Nome Completo" required error={errors.nomeCompleto?.message}>
+                      <TextInput placeholder="Digite aqui" {...register("nomeCompleto")} error={errors.nomeCompleto?.message} />
+                    </FieldGroup>
+                    <FieldGroup label="Nome Social" error={errors.nomeSocial?.message}>
+                      <TextInput placeholder="Digite aqui (opcional)" {...register("nomeSocial")} />
+                    </FieldGroup>
+                  </FieldRow>
+                  <FieldRow>
+                    <FieldGroup label="Data de Nascimento" error={errors.dataNascimento?.message}>
+                      <TextInput type="date" {...register("dataNascimento")} />
+                    </FieldGroup>
+                    <FieldGroup label="Nome da Cidade de Origem" error={errors.cidadeOrigem?.message}>
+                      <TextInput placeholder="Digite aqui" {...register("cidadeOrigem")} />
+                    </FieldGroup>
+                  </FieldRow>
+                  <FieldRow>
+                    <FieldGroup label="Nacionalidade" required error={errors.nacionalidade?.message}>
+                      <TextInput placeholder="Ex: Americana, Francesa..." {...register("nacionalidade")} error={errors.nacionalidade?.message} />
+                    </FieldGroup>
+                    <FieldGroup label="País de Origem" required error={errors.paisOrigem?.message}>
+                      <TextInput placeholder="Digite o país" {...register("paisOrigem")} error={errors.paisOrigem?.message} />
+                    </FieldGroup>
+                  </FieldRow>
+                </>
+              )}
+            </SectionCard>
 
-                {/* Nome Social */}
-                <div>
-                  <Input placeholder="Nome Social" {...register("nomeSocial")} />
-                </div>
-
-                {/* Nome da Mãe */}
-                <div>
-                  <Input placeholder="Nome da Mãe" {...register("nomeMae")} />
-                </div>
-
-                {/* Data de Nascimento */}
-                <div>
-                  <Input
-                    type="date"
-                    placeholder="Data de Nascimento"
-                    {...register("dataNascimento")}
-                  />
-                </div>
-
-                {/* Telefone */}
-                <div>
-                  <Input
-                    placeholder="(00) 9999 9999"
-                    {...register("telefone")}
-                    maxLength={15}
-                  />
-                </div>
-
-                {/* CEP + busca automática */}
-                <div className="flex gap-2">
-                  <div className="relative flex-1">
-                    <Input
-                      placeholder="CEP"
+            {/* ══════════════════════════════════════════
+                CARD 2 — Endereço
+                ══════════════════════════════════════════ */}
+            <SectionCard icon={<MapPin className="w-4 h-4" />} title={tipoPessoa === "JURIDICA" && !estrangeiro ? "Endereço da Empresa" : "Endereço"}>
+              {/* CEP + busca */}
+              <div className="flex gap-2">
+                <div className="flex-1">
+                  <FieldGroup label="CEP">
+                    <TextInput
+                      placeholder="00000-000"
                       {...register("cep")}
                       maxLength={9}
                       onBlur={(e) => buscarCep(e.target.value)}
                     />
-                  </div>
-                  <Button
+                  </FieldGroup>
+                </div>
+                <div className="pt-7">
+                  <button
                     type="button"
-                    variant="outline"
-                    size="icon"
                     onClick={() => buscarCep(watch("cep") ?? "")}
                     disabled={buscandoCep}
+                    className="h-10 w-10 rounded-lg border border-[#1351B4] text-[#1351B4] flex items-center justify-center hover:bg-[#EEF4FF] disabled:opacity-50 transition"
+                    title="Buscar CEP"
                   >
                     <Search className="w-4 h-4" />
-                  </Button>
+                  </button>
                 </div>
+              </div>
 
-                {/* Endereço */}
-                <div>
-                  <Input placeholder="Endereço" {...register("endereco")} />
-                </div>
+              <FieldRow>
+                <FieldGroup label="Estado">
+                  <SelectInput {...register("estado")}>
+                    <option value="">Selecione</option>
+                    {UFS.map((uf) => <option key={uf} value={uf}>{uf}</option>)}
+                  </SelectInput>
+                </FieldGroup>
+                <FieldGroup label="Bairro">
+                  <TextInput placeholder="Digite aqui" {...register("bairro")} />
+                </FieldGroup>
+              </FieldRow>
 
-                {/* Município + UF */}
-                <div className="grid grid-cols-3 gap-2">
-                  <div className="col-span-2">
-                    <Input placeholder="Município" {...register("municipio")} />
-                  </div>
-                  <div>
-                    <select
-                      {...register("uf")}
-                      className="w-full h-10 px-3 rounded-md border border-input text-sm bg-background"
-                    >
-                      <option value="">UF</option>
-                      {UFS.map((uf) => (
-                        <option key={uf} value={uf}>{uf}</option>
-                      ))}
-                    </select>
-                  </div>
-                </div>
+              <FieldRow>
+                <FieldGroup label="Cidade">
+                  <TextInput placeholder="Digite aqui" {...register("cidade")} />
+                </FieldGroup>
+                <FieldGroup label="Logradouro">
+                  <TextInput placeholder="Rua, Av., Travessa..." {...register("logradouro")} />
+                </FieldGroup>
+              </FieldRow>
 
-                <Separator />
+              <FieldRow>
+                <FieldGroup label="Número">
+                  <TextInput placeholder="Nº" {...register("numero")} />
+                </FieldGroup>
+                <FieldGroup label="Complemento (opcional)">
+                  <TextInput placeholder="Apto, Sala, Bloco..." {...register("complemento")} />
+                </FieldGroup>
+              </FieldRow>
+            </SectionCard>
 
-                {/* E-mail */}
-                <div className="space-y-1.5">
-                  <Input
+            {/* ══════════════════════════════════════════
+                CARD 3 — Dados de Contato
+                ══════════════════════════════════════════ */}
+            <SectionCard icon={<Phone className="w-4 h-4" />} title="Dados de Contato">
+              <FieldRow>
+                <FieldGroup label="E-mail" required error={errors.email?.message}>
+                  <TextInput
                     type="email"
-                    placeholder="E-mail"
+                    placeholder="seu@email.com"
                     {...register("email")}
-                    className={errors.email ? "border-destructive" : ""}
+                    error={errors.email?.message}
                     autoComplete="email"
                   />
-                  {errors.email && (
-                    <p className="text-xs text-destructive">{errors.email.message}</p>
-                  )}
-                </div>
-
-                {/* Confirmar e-mail */}
-                <div className="space-y-1.5">
-                  <Input
+                </FieldGroup>
+                <FieldGroup label="Confirmar E-mail" required error={errors.confirmarEmail?.message}>
+                  <TextInput
                     type="email"
-                    placeholder="Confirme E-mail"
+                    placeholder="Repita o e-mail"
                     {...register("confirmarEmail")}
-                    className={errors.confirmarEmail ? "border-destructive" : ""}
+                    error={errors.confirmarEmail?.message}
                     autoComplete="email"
                   />
-                  {errors.confirmarEmail && (
-                    <p className="text-xs text-destructive">{errors.confirmarEmail.message}</p>
-                  )}
-                </div>
+                </FieldGroup>
+              </FieldRow>
+              <FieldGroup label="Telefone" error={errors.telefone?.message}>
+                <TextInput
+                  placeholder="(00) 9 0000-0000"
+                  {...register("telefone")}
+                  maxLength={15}
+                />
+              </FieldGroup>
+            </SectionCard>
 
+            {/* ══════════════════════════════════════════
+                CARD 4 — Acesso (senha + termos)
+                ══════════════════════════════════════════ */}
+            <SectionCard icon={<Lock className="w-4 h-4" />} title="Senha de acesso">
+              <FieldRow>
                 {/* Senha */}
-                <div className="space-y-2">
-                  <Label className="font-semibold">Digite uma senha</Label>
+                <FieldGroup label="Digite uma senha" required error={errors.senha?.message}>
                   <div className="relative">
-                    <Input
+                    <TextInput
                       type={mostrarSenha ? "text" : "password"}
-                      placeholder="••••••••••"
+                      placeholder="••••••••"
                       {...register("senha")}
-                      className={`pr-10 ${errors.senha ? "border-destructive" : ""}`}
+                      error={errors.senha?.message}
                       autoComplete="new-password"
+                      className="pr-11"
                     />
                     <button
                       type="button"
-                      className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground"
                       onClick={() => setMostrarSenha(!mostrarSenha)}
                       tabIndex={-1}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-[#6B6B6B] hover:text-[#1B1B1B]"
                     >
                       {mostrarSenha ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                     </button>
                   </div>
+                </FieldGroup>
 
-                  {/* Requisitos de senha */}
-                  <ul className="space-y-1">
-                    {[
-                      { ok: senhaReqs.especial, texto: "Pelo menos 1 caractere especial (como ! @ # $ %)" },
-                      { ok: senhaReqs.maiuscula, texto: "Pelo menos 1 letra maiúscula (A-Z)" },
-                      { ok: senhaReqs.igual, texto: "As senhas devem ser iguais" },
-                      { ok: senhaReqs.tamanho, texto: "No mínimo 8 caracteres" },
-                    ].map((req) => (
-                      <li key={req.texto} className="flex items-center gap-2">
-                        <span
-                          className="w-2 h-2 rounded-full flex-shrink-0"
-                          style={{ background: req.ok ? "#168821" : "#CCCCCC" }}
-                        />
-                        <span
-                          className="text-xs"
-                          style={{ color: req.ok ? "#168821" : "#6B6B6B" }}
-                        >
-                          {req.texto}
-                        </span>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-
-                {/* Confirmar senha */}
-                <div className="space-y-1.5">
-                  <Label className="font-semibold">Confirmar senha</Label>
+                {/* Confirmar Senha */}
+                <FieldGroup label="Confirmar senha" required error={errors.confirmarSenha?.message}>
                   <div className="relative">
-                    <Input
+                    <TextInput
                       type={mostrarConfirmar ? "text" : "password"}
-                      placeholder="••••••••••"
+                      placeholder="••••••••"
                       {...register("confirmarSenha")}
-                      className={`pr-10 ${errors.confirmarSenha ? "border-destructive" : ""}`}
+                      error={errors.confirmarSenha?.message}
                       autoComplete="new-password"
+                      className="pr-11"
                     />
                     <button
                       type="button"
-                      className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground"
                       onClick={() => setMostrarConfirmar(!mostrarConfirmar)}
                       tabIndex={-1}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-[#6B6B6B] hover:text-[#1B1B1B]"
                     >
                       {mostrarConfirmar ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                     </button>
                   </div>
-                  {errors.confirmarSenha && (
-                    <p className="text-xs text-destructive">{errors.confirmarSenha.message}</p>
-                  )}
-                </div>
+                </FieldGroup>
+              </FieldRow>
 
-                {/* Aceite de termos */}
-                <div className="space-y-1.5">
-                  <label className="flex items-start gap-2 cursor-pointer">
-                    <Checkbox
-                      onCheckedChange={(v) => setValue("aceiteTermos", v ? true : (undefined as any))}
-                      className="mt-0.5"
+              {/* Requisitos */}
+              <div className="grid grid-cols-2 gap-2 pt-1">
+                {[
+                  { ok: senhaReqs.tamanho,  texto: "Mínimo 8 caracteres" },
+                  { ok: senhaReqs.maiuscula, texto: "1 letra maiúscula (A-Z)" },
+                  { ok: senhaReqs.especial,  texto: "1 caractere especial (! @ # $ %)" },
+                  { ok: senhaReqs.igual,     texto: "Senhas coincidem" },
+                ].map((req) => (
+                  <div key={req.texto} className="flex items-center gap-2">
+                    <CheckCircle2
+                      className={`w-4 h-4 flex-shrink-0 ${req.ok ? "text-green-600" : "text-[#CCCCCC]"}`}
                     />
-                    <span className="text-sm">
-                      Li e aceito os{" "}
-                      <Link href="/termos" className="underline" style={{ color: "#1351B4" }}>
-                        Termos de Uso
-                      </Link>{" "}
-                      e a{" "}
-                      <Link href="/privacidade" className="underline" style={{ color: "#1351B4" }}>
-                        Política de Privacidade
-                      </Link>
+                    <span className={`text-xs ${req.ok ? "text-green-700" : "text-[#6B6B6B]"}`}>
+                      {req.texto}
                     </span>
-                  </label>
-                  {errors.aceiteTermos && (
-                    <p className="text-xs text-destructive">{errors.aceiteTermos.message}</p>
-                  )}
-                </div>
+                  </div>
+                ))}
+              </div>
 
-                <Button
-                  type="submit"
-                  className="w-full h-11 font-semibold text-base rounded-full"
-                  style={{ background: "#1351B4" }}
-                  disabled={loading}
-                >
-                  {loading ? "Cadastrando..." : "Cadastrar"}
-                </Button>
-              </form>
-            </CardContent>
-          </Card>
+              {/* Termos */}
+              <div className="pt-2 border-t border-[#E8EAF0]">
+                <label className="flex items-start gap-3 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    onChange={(e) =>
+                      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                      setValue("aceiteTermos", e.target.checked ? true : (undefined as any))
+                    }
+                    className="w-4 h-4 mt-0.5 accent-[#1351B4] rounded"
+                  />
+                  <span className="text-sm text-[#1B1B1B] leading-relaxed">
+                    Li e aceito os{" "}
+                    <Link href="/termos" className="text-[#1351B4] underline underline-offset-2">Termos de Uso</Link>{" "}
+                    e a{" "}
+                    <Link href="/privacidade" className="text-[#1351B4] underline underline-offset-2">Política de Privacidade</Link>
+                  </span>
+                </label>
+                <FieldError msg={errors.aceiteTermos?.message} />
+              </div>
+            </SectionCard>
+
+            {/* ── Botão de envio ── */}
+            <button
+              type="submit"
+              disabled={loading}
+              className="w-full h-12 rounded-[100px] bg-[#1351B4] text-white font-semibold text-base
+                hover:bg-[#0c326f] disabled:opacity-50 transition-colors
+                focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#c2850c]"
+            >
+              {loading ? "Cadastrando..." : "Criar conta"}
+            </button>
+
+            <p className="text-center text-sm text-[#6B6B6B]">
+              Já tem cadastro?{" "}
+              <Link href="/login" className="text-[#1351B4] font-semibold hover:underline">
+                Faça login
+              </Link>
+            </p>
+
+          </form>
         </div>
       </main>
     </div>
