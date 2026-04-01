@@ -4,11 +4,12 @@ import { db } from "@/lib/db";
 
 export async function GET(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params;
     const manifestacao = await db.manifestacao.findUnique({
-      where: { id: params.id },
+      where: { id },
       include: {
         cidadao: { include: { user: { select: { email: true } } } },
         respostas: {
