@@ -1,25 +1,14 @@
-// Prisma 7 com adapter de PostgreSQL
-// PrismaClient é exportado via .prisma/client (gerado pelo prisma generate)
-// eslint-disable-next-line @typescript-eslint/no-require-imports
-const { PrismaClient } = require(".prisma/client");
-import { PrismaPg } from "@prisma/adapter-pg";
+import { PrismaClient } from "@prisma/client";
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-type PrismaClientType = any;
-
-function createPrismaClient(): PrismaClientType {
-  const connectionString = process.env.DATABASE_URL;
-  if (!connectionString) {
-    return new PrismaClient();
-  }
-  const adapter = new PrismaPg({ connectionString });
-  return new PrismaClient({ adapter });
-}
-
+// Singleton pattern para evitar múltiplas conexões em desenvolvimento
 const globalForPrisma = globalThis as unknown as {
-  prisma: PrismaClientType | undefined;
+  prisma: PrismaClient | undefined;
 };
 
-export const db: PrismaClientType = globalForPrisma.prisma ?? createPrismaClient();
+export const db: PrismaClient =
+  globalForPrisma.prisma ??
+  new PrismaClient({
+    log: process.env.NODE_ENV === "development" ? ["error", "warn"] : ["error"],
+  });
 
 if (process.env.NODE_ENV !== "production") globalForPrisma.prisma = db;
