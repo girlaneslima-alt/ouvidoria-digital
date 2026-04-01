@@ -181,28 +181,25 @@ export default function HomePage() {
 
       {/* ── SEÇÃO 2: Como funciona ──────────────────────────────────── */}
       <section
-        className="py-20 px-4"
+        className="py-12 px-4"
         style={{ background: "linear-gradient(180deg, #EEF3FB 0%, #F8F9FC 100%)" }}
         id="como-funciona"
       >
         <div className="max-w-5xl mx-auto">
 
           {/* Header */}
-          <div className="text-center mb-14">
-            <span className="inline-block text-xs font-bold tracking-widest uppercase text-[#1351B4] mb-3 opacity-80">
-              Passo a passo
-            </span>
-            <h2 className="text-3xl sm:text-4xl font-bold text-[#1B1B1B] mb-4">
+          <div className="text-center mb-10">
+            <h2 className="text-2xl sm:text-3xl font-bold text-[#1B1B1B] mb-3">
               Como funciona a{" "}
               <span style={{ color: "#1351B4" }}>ouvidoria digital</span>
             </h2>
-            <p className="text-base text-[#6B6B6B] max-w-lg mx-auto leading-relaxed">
+            <p className="text-sm text-[#6B6B6B] max-w-lg mx-auto leading-relaxed">
               Um processo simples e transparente — do registro até a resposta oficial da instituição.
             </p>
           </div>
 
           {/* Steps grid com linha conectora */}
-          <div className="relative grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-10 lg:gap-6">
+          <div className="relative grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 lg:gap-6">
 
             {/* Linha conectora — só desktop */}
             <div
@@ -220,7 +217,7 @@ export default function HomePage() {
                 <div key={passo.num} className="relative flex flex-col items-center text-center">
 
                   {/* Círculo com ícone + badge numérico */}
-                  <div className="relative mb-6 z-10">
+                  <div className="relative mb-4 z-10">
                     {/* Anel externo */}
                     <div
                       className="absolute -inset-2 rounded-full border-2 border-[#1351B4]/20"
@@ -258,7 +255,7 @@ export default function HomePage() {
           </div>
 
           {/* CTA abaixo dos passos */}
-          <div className="mt-14 text-center">
+          <div className="mt-10 text-center">
             <Link href="/nova-manifestacao">
               <Button size="lg" className="font-bold text-base px-8 shadow-md shadow-[#1351b4]/20">
                 Começar agora
@@ -271,21 +268,18 @@ export default function HomePage() {
 
       {/* ── SEÇÃO 3: O que você quer fazer? ────────────────────────── */}
       <section
-        className="py-20 px-4"
+        className="py-12 px-4"
         style={{ background: "linear-gradient(180deg, #F8F9FC 0%, #FFFFFF 100%)" }}
         id="manifestacoes"
       >
         <div className="max-w-6xl mx-auto">
 
-          <div className="text-center mb-14">
-            <span className="inline-block text-xs font-bold tracking-widest uppercase text-[#1351B4] mb-3 opacity-80">
-              Tipos de manifestação
-            </span>
-            <h2 className="text-3xl sm:text-4xl font-bold mb-4 text-[#1B1B1B]">
+          <div className="text-center mb-10">
+            <h2 className="text-2xl sm:text-3xl font-bold mb-3 text-[#1B1B1B]">
               O que você quer{" "}
               <span style={{ color: "#1351B4" }}>fazer hoje?</span>
             </h2>
-            <p className="text-base text-[#6B6B6B] max-w-xl mx-auto leading-relaxed">
+            <p className="text-sm text-[#6B6B6B] max-w-xl mx-auto leading-relaxed">
               Escolha o canal que melhor descreve sua situação.
               Passe o mouse sobre cada card para ver exemplos práticos.
             </p>
@@ -304,26 +298,11 @@ export default function HomePage() {
               <TipoCard key={tipo.label} tipo={tipo} />
             ))}
           </div>
-
-          {/* CTAs */}
-          <div className="mt-14 flex flex-col sm:flex-row gap-3 justify-center max-w-md mx-auto">
-            <Link href="/login" className="flex-1">
-              <Button size="lg" fullWidth className="font-bold text-base shadow-md shadow-[#1351b4]/20">
-                Fazer uma manifestação
-              </Button>
-            </Link>
-            <Link href="/consultar-protocolo" className="flex-1">
-              <Button size="lg" variant="outline" fullWidth className="font-semibold text-base">
-                <Search className="w-5 h-5" />
-                Consultar protocolo
-              </Button>
-            </Link>
-          </div>
         </div>
       </section>
 
       {/* ── SEÇÃO 4: Consultar protocolo ───────────────────────────── */}
-      <section className="py-16 px-4" style={{ background: "#F8F8F8" }}>
+      <section className="py-12 px-4" style={{ background: "#F8F8F8" }}>
         <div className="max-w-3xl mx-auto text-center">
           <h2 className="text-2xl font-bold mb-3" style={{ color: "#1351B4" }}>
             Acompanhar manifestação
