@@ -10,15 +10,16 @@ const schema = z.object({
 
 export async function POST(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params;
     const session = await auth();
     const body = await req.json();
     const { nota, texto } = schema.parse(body);
 
     const manifestacao = await db.manifestacao.findUnique({
-      where: { id: params.id },
+      where: { id },
       include: { cidadao: true, avaliacao: true },
     });
 
@@ -38,7 +39,7 @@ export async function POST(
 
     const avaliacao = await db.avaliacao.create({
       data: {
-        manifestacaoId: params.id,
+        manifestacaoId: id,
         nota,
         texto: texto ?? null,
       },
