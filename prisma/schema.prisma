@@ -200,10 +200,24 @@ model Manifestacao {
   sigiloso        Boolean            @default(false)
   canalEntrada    CanalEntrada       @default(WEB)
 
-  cidadaoId       String
-  cidadao         Cidadao            @relation(fields: [cidadaoId], references: [id])
+  // Cidadão (opcional — manifestações anônimas têm cidadaoId null)
+  cidadaoId       String?
+  cidadao         Cidadao?           @relation(fields: [cidadaoId], references: [id])
   unidadeOrigemId String?
   unidadeOrigem   Unidade?           @relation("UnidadeOrigem", fields: [unidadeOrigemId], references: [id])
+
+  // Campos adicionais do formulário
+  referidoNome     String?
+  referidoCpf      String?
+  referidoDataNasc String?
+  localFato        String?
+  localEsfera      String?
+  localOrgao       String?
+  localMunicipio   String?
+  localEstado      String?
+  ouvidoriaEsfera  String?
+  colaboradorOrgao Boolean           @default(false)
+  envolvidos       Json?
 
   prazoLegal       DateTime?
   dataResposta     DateTime?
@@ -212,6 +226,8 @@ model Manifestacao {
 
   encaminhamentos Encaminhamento[]
   respostas       Resposta[]
+  complementos    Complemento[]
+  avaliacao       Avaliacao?
   prazo           Prazo?
 
   createdAt DateTime @default(now())
@@ -288,6 +304,27 @@ enum TipoResposta {
   TECNICA
   PARCIAL
   FINAL
+}
+
+// ─── Complemento (aditamento pelo cidadão) ───────────────────────────────────
+
+model Complemento {
+  id             String       @id @default(cuid())
+  manifestacaoId String
+  manifestacao   Manifestacao @relation(fields: [manifestacaoId], references: [id], onDelete: Cascade)
+  texto          String       @db.Text
+  createdAt      DateTime     @default(now())
+}
+
+// ─── Avaliação do atendimento ─────────────────────────────────────────────────
+
+model Avaliacao {
+  id             String       @id @default(cuid())
+  manifestacaoId String       @unique
+  manifestacao   Manifestacao @relation(fields: [manifestacaoId], references: [id], onDelete: Cascade)
+  nota           Int
+  texto          String?      @db.Text
+  createdAt      DateTime     @default(now())
 }
 
 // ─── Prazo ────────────────────────────────────────────────────────────────────

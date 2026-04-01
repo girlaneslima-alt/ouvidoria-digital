@@ -1,13 +1,10 @@
 import { z } from "zod";
 
-// ─── Cadastro do Cidadão ──────────────────────────────────────────────────────
-
 export const cadastroCidadaoSchema = z
   .object({
     estrangeiro: z.boolean().default(false),
     tipoPessoa: z.enum(["FISICA", "JURIDICA"]).default("FISICA"),
 
-    // ── Pessoa Física ──
     nomeCompleto: z.string().min(3, "Nome completo é obrigatório"),
     nomeSocial:   z.string().optional(),
     nomeMae:      z.string().optional(),
@@ -15,12 +12,10 @@ export const cadastroCidadaoSchema = z
     cpf:          z.string().optional(),
     naoTemCpf:    z.boolean().default(false),
 
-    // ── Estrangeiro ──
     nacionalidade: z.string().optional(),
     paisOrigem:    z.string().optional(),
     cidadeOrigem:  z.string().optional(),
 
-    // ── Pessoa Jurídica ──
     nomeRepresentante:   z.string().optional(),
     cpfRepresentante:    z.string().optional(),
     emailRepresentante:  z.string().optional(),
@@ -28,7 +23,6 @@ export const cadastroCidadaoSchema = z
     cnpj:                z.string().optional(),
     contratoEmpresa:     z.string().optional(),
 
-    // ── Endereço ──
     cep:          z.string().optional(),
     estado:       z.string().optional(),
     bairro:       z.string().optional(),
@@ -36,17 +30,14 @@ export const cadastroCidadaoSchema = z
     logradouro:   z.string().optional(),
     numero:       z.string().optional(),
     complemento:  z.string().optional(),
-    // aliases para compatibilidade com a API existente
     endereco:     z.string().optional(),
     municipio:    z.string().optional(),
     uf:           z.string().max(2).optional(),
 
-    // ── Contato ──
     telefone: z.string().optional(),
     email:    z.string().email("E-mail inválido"),
     confirmarEmail: z.string().email("E-mail inválido"),
 
-    // ── Acesso ──
     senha: z
       .string()
       .min(8, "Mínimo 8 caracteres")
@@ -95,7 +86,12 @@ export const cadastroCidadaoSchema = z
 
 export type CadastroCidadaoInput = z.infer<typeof cadastroCidadaoSchema>;
 
-// ─── Nova Manifestação ────────────────────────────────────────────────────────
+const envolvidoSchema = z.object({
+  nome:   z.string().min(1),
+  cpf:    z.string().optional(),
+  esfera: z.string().optional(),
+  orgao:  z.string().optional(),
+});
 
 export const novaManifestacaoSchema = z.object({
   tipo: z.enum([
@@ -107,18 +103,28 @@ export const novaManifestacaoSchema = z.object({
     "INFORMACAO",
     "RECLAMACAO",
   ]),
-  assunto: z.string().min(5, "Assunto é obrigatório").max(200),
-  descricao: z
-    .string()
-    .min(20, "Descreva com pelo menos 20 caracteres")
-    .max(5000),
-  sigiloso: z.boolean().default(false),
+  assunto:  z.string().min(5, "Assunto é obrigatório").max(200),
+  descricao: z.string().min(20, "Descreva com pelo menos 20 caracteres").max(8000),
+  sigiloso:  z.boolean().default(false),
   unidadeOrigemId: z.string().optional(),
+
+  referidoNome:     z.string().optional(),
+  referidoCpf:      z.string().optional(),
+  referidoDataNasc: z.string().optional(),
+
+  localFato:      z.string().optional(),
+  localEsfera:    z.string().optional(),
+  localOrgao:     z.string().optional(),
+  localMunicipio: z.string().optional(),
+  localEstado:    z.string().optional(),
+
+  ouvidoriaEsfera: z.string().optional(),
+  colaboradorOrgao: z.boolean().default(false),
+
+  envolvidos: z.array(envolvidoSchema).default([]),
 });
 
 export type NovaManifestacaoInput = z.infer<typeof novaManifestacaoSchema>;
-
-// ─── Consulta por Protocolo ───────────────────────────────────────────────────
 
 export const consultaProtocoloSchema = z.object({
   protocolo: z
