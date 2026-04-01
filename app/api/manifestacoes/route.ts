@@ -5,7 +5,6 @@ import { novaManifestacaoSchema } from "@/lib/validations";
 import { gerarProtocolo, calcularPrazoLegal, TIPO_MANIFESTACAO_LABELS } from "@/lib/manifestacao";
 import { enviarEmailProtocolo } from "@/lib/email";
 
-// GET — lista manifestações do cidadão logado
 export async function GET(req: NextRequest) {
   const session = await auth();
   if (!session?.user?.id) {
@@ -29,41 +28,54 @@ export async function GET(req: NextRequest) {
   return NextResponse.json(cidadao.manifestacoes);
 }
 
-// POST — nova manifestação
 export async function POST(req: NextRequest) {
-  const session = await auth();
-  if (!session?.user?.id) {
-    return NextResponse.json({ error: "Não autorizado" }, { status: 401 });
-  }
-
   try {
     const body = await req.json();
     const data = novaManifestacaoSchema.parse(body);
 
-    const cidadao = await db.cidadao.findUnique({
-      where: { userId: session.user.id },
-      include: { user: true },
-    });
-
-    if (!cidadao) {
-      return NextResponse.json({ error: "Complete seu perfil primeiro." }, { status: 400 });
-    }
-
+    const session = await auth();
     const protocolo = gerarProtocolo();
     const prazoLegal = calcularPrazoLegal(new Date());
+
+    let cidadaoId: string | null = null;
+    let cidadaoEmail: string | null = null;
+    let cidadaoNome: string | null = null;
+
+    if (session?.user?.id) {
+      const cidadao = await db.cidadao.findUnique({
+        where: { userId: session.user.id },
+        include: { user: true },
+      });
+      if (cidadao) {
+        cidadaoId = cidadao.id;
+        cidadaoEmail = cidadao.user.email;
+        cidadaoNome = cidadao.nomeSocial ?? cidadao.nomeCompleto;
+      }
+    }
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const manifestacao = await db.$transaction(async (tx: any) => {
       const m = await tx.manifestacao.create({
         data: {
           protocolo,
-          tipo: data.tipo,
-          assunto: data.assunto,
-          descricao: data.descricao,
-          sigiloso: data.sigiloso,
-          cidadaoId: cidadao.id,
+          tipo:            data.tipo,
+          assunto:         data.assunto,
+          descricao:       data.descricao,
+          sigiloso:        data.sigiloso,
+          cidadaoId:       cidadaoId ?? null,
           unidadeOrigemId: data.unidadeOrigemId ?? null,
           prazoLegal,
+          referidoNome:     data.referidoNome     ?? null,
+          referidoCpf:      data.referidoCpf      ?? null,
+          referidoDataNasc: data.referidoDataNasc ?? null,
+          localFato:        data.localFato        ?? null,
+          localEsfera:      data.localEsfera      ?? null,
+          localOrgao:       data.localOrgao       ?? null,
+          localMunicipio:   data.localMunicipio   ?? null,
+          localEstado:      data.localEstado      ?? null,
+          ouvidoriaEsfera:  data.ouvidoriaEsfera  ?? null,
+          colaboradorOrgao: data.colaboradorOrgao ?? false,
+          envolvidos:       data.envolvidos.length > 0 ? data.envolvidos : null,
         },
       });
 
@@ -77,20 +89,19 @@ export async function POST(req: NextRequest) {
       return m;
     });
 
-    // Envia e-mail de confirmação
-    if (cidadao.user.email) {
+    if (cidadaoEmail) {
       await enviarEmailProtocolo({
-        email: cidadao.user.email,
-        nome: cidadao.nomeSocial ?? cidadao.nomeCompleto,
+        email:    cidadaoEmail,
+        nome:     cidadaoNome ?? "Cidadão",
         protocolo,
-        tipo: TIPO_MANIFESTACAO_LABELS[data.tipo],
+        tipo:     TIPO_MANIFESTACAO_LABELS[data.tipo],
       }).catch(console.error);
     }
 
     return NextResponse.json({ protocolo, id: manifestacao.id }, { status: 201 });
   } catch (err: any) {
     if (err.name === "ZodError") {
-      return NextResponse.json({ error: "Dados inválidos." }, { status: 400 });
+      return NextResponse.json({ error: "Dados inválidos.", issues: err.issues }, { status: 400 });
     }
     console.error("[MANIFESTACAO]", err);
     return NextResponse.json({ error: "Erro interno." }, { status: 500 });

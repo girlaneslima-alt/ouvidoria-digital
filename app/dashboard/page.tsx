@@ -4,16 +4,10 @@ import { db } from "@/lib/db";
 import { Navbar } from "@/components/layout/navbar";
 import { Footer } from "@/components/layout/footer";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import Link from "next/link";
-import { Plus, FileText, Clock, CheckCircle } from "lucide-react";
-import {
-  TIPO_MANIFESTACAO_LABELS,
-  STATUS_LABELS,
-  STATUS_COR,
-  TIPO_MANIFESTACAO_COR,
-} from "@/lib/manifestacao";
+import { ExternalLink, ChevronRight } from "lucide-react";
+import { STATUS_LABELS, STATUS_COR } from "@/lib/manifestacao";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 
@@ -24,141 +18,137 @@ export default async function DashboardPage() {
   const cidadao = await db.cidadao.findUnique({
     where: { userId: session.user.id },
     include: {
+      user: { select: { email: true } },
       manifestacoes: {
         orderBy: { createdAt: "desc" },
-        take: 10,
+        take: 50,
         include: { prazo: true },
       },
     },
   });
 
-  const nome = cidadao?.nomeSocial ?? cidadao?.nomeCompleto ?? session.user.name ?? "Cidadão";
   const manifestacoes = cidadao?.manifestacoes ?? [];
 
-  const stats = {
-    total: manifestacoes.length,
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    emAndamento: manifestacoes.filter((m: any) =>
-      ["REGISTRADA", "EM_ANALISE", "ENCAMINHADA", "AGUARDANDO_RESPOSTA"].includes(m.status)
-    ).length,
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    respondidas: manifestacoes.filter((m: any) => m.status === "RESPONDIDA").length,
-  };
-
   return (
-    <div className="flex flex-col min-h-screen">
+    <div className="flex flex-col min-h-screen bg-[#F8F8F8]">
       <Navbar />
-      <main className="flex-1 py-10 px-4">
+      <main className="flex-1 py-8 px-4">
         <div className="max-w-4xl mx-auto">
-          {/* Boas-vindas */}
-          <div className="flex items-center justify-between mb-8">
-            <div>
-              <h1 className="text-2xl font-bold" style={{ color: "#1351B4" }}>
-                Olá, {nome.split(" ")[0]}!
-              </h1>
-              <p className="text-sm text-muted-foreground mt-1">
-                Acompanhe suas manifestações registradas na Ouvidoria Digital.
-              </p>
-            </div>
+
+          <div className="flex justify-end mb-6">
             <Link href="/nova-manifestacao">
-              <Button style={{ background: "#1351B4" }} className="gap-2 font-semibold">
-                <Plus className="w-4 h-4" />
-                Nova Manifestação
+              <Button variant="outline" className="gap-2 font-semibold border-[#1351B4] text-[#1351B4] hover:bg-[#EEF4FF]">
+                Nova manifestação
+                <ExternalLink className="w-4 h-4" />
               </Button>
             </Link>
           </div>
 
-          {/* Stats */}
-          <div className="grid grid-cols-3 gap-4 mb-8">
-            {[
-              { label: "Total", valor: stats.total, icon: FileText, cor: "#1351B4" },
-              { label: "Em andamento", valor: stats.emAndamento, icon: Clock, cor: "#E06200" },
-              { label: "Respondidas", valor: stats.respondidas, icon: CheckCircle, cor: "#168821" },
-            ].map((stat) => {
-              const Icon = stat.icon;
-              return (
-                <Card key={stat.label} className="border border-border">
-                  <CardContent className="pt-5 pb-4">
-                    <div className="flex items-center gap-3">
-                      <div
-                        className="w-9 h-9 rounded-lg flex items-center justify-center"
-                        style={{ background: `${stat.cor}15` }}
-                      >
-                        <Icon className="w-5 h-5" style={{ color: stat.cor }} />
-                      </div>
-                      <div>
-                        <p className="text-2xl font-bold" style={{ color: stat.cor }}>
-                          {stat.valor}
-                        </p>
-                        <p className="text-xs text-muted-foreground">{stat.label}</p>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              );
-            })}
+          {/* Dados Pessoais */}
+          <div className="bg-white rounded-2xl border border-[#E8EAF0] p-6 mb-4 shadow-sm">
+            <div className="flex items-center gap-2 mb-4">
+              <div className="w-1 h-5 rounded-full bg-[#1351B4]" />
+              <h2 className="text-base font-semibold text-[#1B1B1B]">Dados Pessoais</h2>
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-4">
+              <div><p className="text-xs text-muted-foreground mb-0.5">Nome Completo</p><p className="text-sm font-medium">{cidadao?.nomeCompleto || "—"}</p></div>
+              <div><p className="text-xs text-muted-foreground mb-0.5">Nome Social</p><p className="text-sm font-medium">{cidadao?.nomeSocial || "—"}</p></div>
+              <div><p className="text-xs text-muted-foreground mb-0.5">CPF/CNPJ</p><p className="text-sm font-medium">{cidadao?.cpf ?? cidadao?.cnpj ?? "—"}</p></div>
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-4">
+              <div>
+                <p className="text-xs text-muted-foreground mb-0.5">Data de Nascimento</p>
+                <p className="text-sm font-medium">
+                  {cidadao?.dataNascimento ? format(new Date(cidadao.dataNascimento), "dd/MM/yyyy", { locale: ptBR }) : "—"}
+                </p>
+              </div>
+              <div><p className="text-xs text-muted-foreground mb-0.5">Nome da Mãe</p><p className="text-sm font-medium">{cidadao?.nomeMae || "—"}</p></div>
+              <div><p className="text-xs text-muted-foreground mb-0.5">Telefone</p><p className="text-sm font-medium">{cidadao?.telefone || "—"}</p></div>
+            </div>
+            <div><p className="text-xs text-muted-foreground mb-0.5">E-mail</p><p className="text-sm font-medium">{cidadao?.user?.email || "—"}</p></div>
+
+            <div className="flex items-center gap-2 mt-6 mb-4">
+              <div className="w-1 h-5 rounded-full bg-[#1351B4]" />
+              <h2 className="text-base font-semibold text-[#1B1B1B]">Endereço</h2>
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-4">
+              <div><p className="text-xs text-muted-foreground mb-0.5">Logradouro</p><p className="text-sm font-medium">{cidadao?.logradouro ?? cidadao?.endereco ?? "—"}</p></div>
+              <div><p className="text-xs text-muted-foreground mb-0.5">Complemento</p><p className="text-sm font-medium">{cidadao?.complemento || "—"}</p></div>
+              <div><p className="text-xs text-muted-foreground mb-0.5">Número</p><p className="text-sm font-medium">{cidadao?.numero || "—"}</p></div>
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+              <div><p className="text-xs text-muted-foreground mb-0.5">Bairro</p><p className="text-sm font-medium">{cidadao?.bairro || "—"}</p></div>
+              <div>
+                <p className="text-xs text-muted-foreground mb-0.5">Cidade/UF</p>
+                <p className="text-sm font-medium">
+                  {cidadao?.cidade && cidadao?.estado ? `${cidadao.cidade} / ${cidadao.estado}` : cidadao?.municipio ?? cidadao?.cidade ?? "—"}
+                </p>
+              </div>
+              <div><p className="text-xs text-muted-foreground mb-0.5">CEP</p><p className="text-sm font-medium">{cidadao?.cep || "—"}</p></div>
+            </div>
+
+            <p className="text-xs text-muted-foreground mt-5">
+              Mantenha seus dados atualizados para garantir o recebimento das comunicações oficiais da Ouvidoria.{" "}
+              <Link href="/perfil" className="underline" style={{ color: "#1351B4" }}>Clique aqui para atualizar</Link>
+            </p>
           </div>
 
-          {/* Lista de manifestações */}
-          <Card className="border border-border">
-            <CardHeader className="pb-3 border-b border-border">
-              <CardTitle className="text-base font-semibold">Minhas manifestações</CardTitle>
-            </CardHeader>
-            <CardContent className="pt-0">
-              {manifestacoes.length === 0 ? (
-                <div className="py-16 text-center">
-                  <FileText className="w-12 h-12 mx-auto text-muted-foreground/40 mb-4" />
-                  <p className="text-muted-foreground text-sm">
-                    Você ainda não registrou nenhuma manifestação.
-                  </p>
-                  <Link href="/nova-manifestacao">
-                    <Button
-                      className="mt-4 font-semibold"
-                      style={{ background: "#1351B4" }}
-                    >
-                      Registrar primeira manifestação
-                    </Button>
-                  </Link>
-                </div>
-              ) : (
-                <div className="divide-y divide-border">
+          <div className="border-t border-[#E8EAF0] my-6" />
+
+          <h2 className="text-base font-semibold text-[#1B1B1B] mb-4">Manifestações registradas</h2>
+
+          <div className="bg-white rounded-2xl border border-[#E8EAF0] overflow-hidden shadow-sm">
+            {manifestacoes.length === 0 ? (
+              <div className="py-16 text-center px-4">
+                <p className="text-muted-foreground text-sm mb-4">Você ainda não registrou nenhuma manifestação.</p>
+                <Link href="/nova-manifestacao">
+                  <Button style={{ background: "#1351B4" }} className="font-semibold">Registrar primeira manifestação</Button>
+                </Link>
+              </div>
+            ) : (
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className="bg-[#F0F4FA] border-b border-[#E8EAF0]">
+                    <th className="text-left px-4 py-3 text-xs font-semibold text-[#6B6B6B] uppercase tracking-wide">Protocolo</th>
+                    <th className="text-left px-4 py-3 text-xs font-semibold text-[#6B6B6B] uppercase tracking-wide">Assunto</th>
+                    <th className="text-left px-4 py-3 text-xs font-semibold text-[#6B6B6B] uppercase tracking-wide hidden sm:table-cell">Data de Abertura</th>
+                    <th className="text-left px-4 py-3 text-xs font-semibold text-[#6B6B6B] uppercase tracking-wide hidden md:table-cell">Prazo</th>
+                    <th className="text-left px-4 py-3 text-xs font-semibold text-[#6B6B6B] uppercase tracking-wide">Situação</th>
+                    <th className="w-8" />
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-[#F0F0F0]">
                   {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
                   {manifestacoes.map((m: any) => (
-                    <div key={m.id} className="py-4 flex items-start justify-between gap-4">
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-center gap-2 mb-1">
-                          <span
-                            className="text-xs font-semibold px-2 py-0.5 rounded-full text-white"
-                            style={{
-                              background: (TIPO_MANIFESTACAO_COR as Record<string, string>)[m.tipo] ?? "#6B6B6B",
-                            }}
-                          >
-                            {(TIPO_MANIFESTACAO_LABELS as Record<string, string>)[m.tipo]}
-                          </span>
-                        </div>
-                        <p className="text-sm font-medium truncate">{m.assunto}</p>
-                        <p className="text-xs text-muted-foreground mt-0.5">
-                          Protocolo:{" "}
-                          <span className="font-mono font-medium">{m.protocolo}</span>{" "}
-                          · {format(new Date(m.createdAt), "dd/MM/yyyy", { locale: ptBR })}
-                        </p>
-                      </div>
-                      <div className="flex-shrink-0">
-                        <Badge
-                          className="text-xs text-white font-semibold"
-                          style={{
-                            background: (STATUS_COR as Record<string, string>)[m.status] ?? "#6B6B6B",
-                          }}
-                        >
+                    <tr key={m.id} className="hover:bg-[#F8F8F8] transition-colors">
+                      <td className="px-4 py-3.5">
+                        <Link href={`/manifestacao/${m.id}`} className="font-mono text-xs font-semibold hover:underline" style={{ color: "#1351B4" }}>
+                          {m.protocolo.slice(0, 8) + "/" + m.protocolo.slice(8, 10)}
+                        </Link>
+                      </td>
+                      <td className="px-4 py-3.5 max-w-[200px]">
+                        <Link href={`/manifestacao/${m.id}`} className="text-sm text-[#1B1B1B] hover:underline line-clamp-1">{m.assunto}</Link>
+                      </td>
+                      <td className="px-4 py-3.5 text-sm text-[#6B6B6B] hidden sm:table-cell">
+                        {format(new Date(m.createdAt), "dd/MM/yyyy", { locale: ptBR })}
+                      </td>
+                      <td className="px-4 py-3.5 text-sm text-[#6B6B6B] hidden md:table-cell">
+                        {m.prazo?.dataLimite ? format(new Date(m.prazo.dataLimite), "dd/MM/yyyy", { locale: ptBR }) : "—"}
+                      </td>
+                      <td className="px-4 py-3.5">
+                        <Badge className="text-xs font-semibold text-white whitespace-nowrap" style={{ background: (STATUS_COR as Record<string, string>)[m.status] ?? "#6B6B6B" }}>
                           {(STATUS_LABELS as Record<string, string>)[m.status]}
                         </Badge>
-                      </div>
-                    </div>
+                      </td>
+                      <td className="pr-3">
+                        <Link href={`/manifestacao/${m.id}`}><ChevronRight className="w-4 h-4 text-muted-foreground" /></Link>
+                      </td>
+                    </tr>
                   ))}
-                </div>
-              )}
-            </CardContent>
-          </Card>
+                </tbody>
+              </table>
+            )}
+          </div>
         </div>
       </main>
       <Footer />

@@ -14,17 +14,14 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
     error: "/login",
   },
   providers: [
-    // Login com Google (GOV.BR usa Google por baixo para cidadãos)
     Google({
       clientId: process.env.AUTH_GOOGLE_ID!,
       clientSecret: process.env.AUTH_GOOGLE_SECRET!,
     }),
-    // Magic link via email (Resend)
     Resend({
       apiKey: process.env.AUTH_RESEND_KEY!,
       from: process.env.EMAIL_FROM ?? "noreply@ouvidoria.gov.br",
     }),
-    // Credenciais (cadastro próprio na plataforma)
     Credentials({
       name: "credentials",
       credentials: {
@@ -41,16 +38,16 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
 
         if (!user || !user.emailVerified) return null;
 
-        // Senha armazenada no campo auxiliar — buscamos no perfil do cidadão
-        const senhaHash = await db.$queryRaw<{ senha: string }[]>`
-          SELECT senha FROM "SenhaCidadao" WHERE "userId" = ${user.id} LIMIT 1
-        `.catch(() => []);
+        // Busca via ORM em vez de raw SQL (evita problemas de case sensitivity)
+        const senhaCidadao = await db.senhaCidadao.findUnique({
+          where: { userId: user.id },
+        });
 
-        if (!senhaHash.length) return null;
+        if (!senhaCidadao) return null;
 
         const valid = await bcrypt.compare(
           credentials.password as string,
-          senhaHash[0].senha
+          senhaCidadao.senha
         );
 
         if (!valid) return null;
