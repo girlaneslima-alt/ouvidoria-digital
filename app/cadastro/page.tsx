@@ -500,88 +500,188 @@ export default function CadastroPage() {
             {/* ══════════════════════════════════════════
                 CARD 4 — Acesso (senha + termos)
                 ══════════════════════════════════════════ */}
-            <SectionCard icon={<Lock className="w-4 h-4" />} title="Senha de acesso">
-              <FieldRow>
-                {/* Senha */}
-                <FieldGroup label="Digite uma senha" required error={errors.senha?.message}>
-                  <div className="relative">
-                    <TextInput
-                      type={mostrarSenha ? "text" : "password"}
-                      placeholder="••••••••"
-                      {...register("senha")}
-                      error={errors.senha?.message}
-                      autoComplete="new-password"
-                      className="pr-11"
-                    />
-                    <button
-                      type="button"
-                      onClick={() => setMostrarSenha(!mostrarSenha)}
-                      tabIndex={-1}
-                      className="absolute right-3 top-1/2 -translate-y-1/2 text-[#6B6B6B] hover:text-[#1B1B1B]"
-                    >
-                      {mostrarSenha ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                    </button>
-                  </div>
-                </FieldGroup>
+            <SectionCard icon={<Lock className="w-4 h-4" />} title="Crie sua senha de acesso">
 
-                {/* Confirmar Senha */}
-                <FieldGroup label="Confirmar senha" required error={errors.confirmarSenha?.message}>
-                  <div className="relative">
-                    <TextInput
-                      type={mostrarConfirmar ? "text" : "password"}
-                      placeholder="••••••••"
-                      {...register("confirmarSenha")}
-                      error={errors.confirmarSenha?.message}
-                      autoComplete="new-password"
-                      className="pr-11"
-                    />
-                    <button
-                      type="button"
-                      onClick={() => setMostrarConfirmar(!mostrarConfirmar)}
-                      tabIndex={-1}
-                      className="absolute right-3 top-1/2 -translate-y-1/2 text-[#6B6B6B] hover:text-[#1B1B1B]"
-                    >
-                      {mostrarConfirmar ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                    </button>
-                  </div>
-                </FieldGroup>
-              </FieldRow>
+              {/* Instrução contextual para todos os níveis de usuário */}
+              <div className="flex items-start gap-3 bg-[#F0F4FF] border border-[#C7D7F5] rounded-xl px-4 py-3">
+                <Lock className="w-4 h-4 text-[#1351B4] shrink-0 mt-0.5" />
+                <p className="text-sm text-[#1351B4] leading-relaxed">
+                  Você vai usar essa senha toda vez que quiser acessar sua conta.
+                  <strong className="block mt-0.5 text-[#0c326f]">Não compartilhe sua senha com ninguém.</strong>
+                </p>
+              </div>
 
-              {/* Requisitos */}
-              <div className="grid grid-cols-2 gap-2 pt-1">
+              {/* ── Campo: Nova Senha ── */}
+              <div className="space-y-1.5">
+                <label htmlFor="senha" className="block text-sm font-semibold text-[#1B1B1B]">
+                  Crie uma senha <span className="text-red-500">*</span>
+                </label>
+                <p className="text-xs text-[#6B6B6B]">
+                  Escolha uma senha que só você saiba. Ela será usada para entrar na plataforma.
+                </p>
+                <div className="relative">
+                  <TextInput
+                    id="senha"
+                    type={mostrarSenha ? "text" : "password"}
+                    placeholder={mostrarSenha ? "Digite sua senha" : "Clique aqui e digite sua senha"}
+                    {...register("senha")}
+                    error={errors.senha?.message}
+                    autoComplete="new-password"
+                    className="pr-28"
+                  />
+                  {/* Botão com ícone + texto — mais claro para todos os perfis */}
+                  <button
+                    type="button"
+                    onClick={() => setMostrarSenha(!mostrarSenha)}
+                    className="absolute right-2 top-1/2 -translate-y-1/2 flex items-center gap-1.5
+                      px-2.5 py-1 rounded-md text-xs font-medium text-[#1351B4]
+                      hover:bg-[#EEF4FF] transition-colors border border-transparent hover:border-[#C7D7F5]"
+                  >
+                    {mostrarSenha
+                      ? <><EyeOff className="w-3.5 h-3.5" /> Ocultar</>
+                      : <><Eye    className="w-3.5 h-3.5" /> Mostrar</>
+                    }
+                  </button>
+                </div>
+                <FieldError msg={errors.senha?.message} />
+
+                {/* Barra de força da senha */}
+                {senha.length > 0 && (
+                  <div className="space-y-1.5 pt-1">
+                    <div className="flex gap-1.5">
+                      {[1, 2, 3, 4].map((n) => {
+                        const nivel = [
+                          senhaReqs.tamanho,
+                          senhaReqs.maiuscula,
+                          senhaReqs.especial,
+                          senhaReqs.igual,
+                        ].filter(Boolean).length;
+                        const ativo = n <= nivel;
+                        const cor =
+                          nivel <= 1 ? "bg-red-500"
+                          : nivel === 2 ? "bg-orange-400"
+                          : nivel === 3 ? "bg-yellow-400"
+                          : "bg-green-500";
+                        return (
+                          <div
+                            key={n}
+                            className={`flex-1 h-1.5 rounded-full transition-all duration-300 ${ativo ? cor : "bg-[#E8EAF0]"}`}
+                          />
+                        );
+                      })}
+                    </div>
+                    <p className={`text-xs font-medium ${
+                      [senhaReqs.tamanho, senhaReqs.maiuscula, senhaReqs.especial, senhaReqs.igual].filter(Boolean).length <= 1
+                        ? "text-red-600"
+                        : [senhaReqs.tamanho, senhaReqs.maiuscula, senhaReqs.especial, senhaReqs.igual].filter(Boolean).length === 2
+                        ? "text-orange-500"
+                        : [senhaReqs.tamanho, senhaReqs.maiuscula, senhaReqs.especial, senhaReqs.igual].filter(Boolean).length === 3
+                        ? "text-yellow-600"
+                        : "text-green-600"
+                    }`}>
+                      Força da senha:{" "}
+                      {[senhaReqs.tamanho, senhaReqs.maiuscula, senhaReqs.especial, senhaReqs.igual].filter(Boolean).length <= 1
+                        ? "Fraca"
+                        : [senhaReqs.tamanho, senhaReqs.maiuscula, senhaReqs.especial, senhaReqs.igual].filter(Boolean).length === 2
+                        ? "Razoável"
+                        : [senhaReqs.tamanho, senhaReqs.maiuscula, senhaReqs.especial, senhaReqs.igual].filter(Boolean).length === 3
+                        ? "Boa"
+                        : "Forte ✓"}
+                    </p>
+                  </div>
+                )}
+              </div>
+
+              {/* Requisitos — lista vertical, ícone + texto claro */}
+              <div className="bg-[#F8F8F8] border border-[#E8EAF0] rounded-xl p-4 space-y-2.5">
+                <p className="text-xs font-semibold text-[#1B1B1B] mb-1">Sua senha precisa ter:</p>
                 {[
-                  { ok: senhaReqs.tamanho,  texto: "Mínimo 8 caracteres" },
-                  { ok: senhaReqs.maiuscula, texto: "1 letra maiúscula (A-Z)" },
-                  { ok: senhaReqs.especial,  texto: "1 caractere especial (! @ # $ %)" },
-                  { ok: senhaReqs.igual,     texto: "Senhas coincidem" },
+                  { ok: senhaReqs.tamanho,   texto: "No mínimo 8 caracteres", ex: "Ex: abcdefgh" },
+                  { ok: senhaReqs.maiuscula,  texto: "Pelo menos 1 letra maiúscula", ex: "Ex: A, B, C..." },
+                  { ok: senhaReqs.especial,   texto: "Pelo menos 1 caractere especial", ex: "Ex: ! @ # $ %" },
                 ].map((req) => (
-                  <div key={req.texto} className="flex items-center gap-2">
-                    <CheckCircle2
-                      className={`w-4 h-4 flex-shrink-0 ${req.ok ? "text-green-600" : "text-[#CCCCCC]"}`}
-                    />
-                    <span className={`text-xs ${req.ok ? "text-green-700" : "text-[#6B6B6B]"}`}>
-                      {req.texto}
-                    </span>
+                  <div key={req.texto} className="flex items-start gap-2.5">
+                    <div className={`w-5 h-5 rounded-full flex items-center justify-center shrink-0 mt-0.5 transition-colors
+                      ${req.ok ? "bg-green-100" : "bg-[#E8EAF0]"}`}>
+                      {req.ok
+                        ? <CheckCircle2 className="w-3.5 h-3.5 text-green-600" />
+                        : <span className="w-2 h-2 rounded-full bg-[#CCCCCC] block" />
+                      }
+                    </div>
+                    <div>
+                      <span className={`text-sm ${req.ok ? "text-green-700 font-medium" : "text-[#1B1B1B]"}`}>
+                        {req.texto}
+                      </span>
+                      {!req.ok && (
+                        <span className="text-xs text-[#6B6B6B] ml-1.5">{req.ex}</span>
+                      )}
+                    </div>
                   </div>
                 ))}
               </div>
 
+              {/* ── Campo: Confirmar Senha ── */}
+              <div className="space-y-1.5">
+                <label htmlFor="confirmarSenha" className="block text-sm font-semibold text-[#1B1B1B]">
+                  Repita a senha <span className="text-red-500">*</span>
+                </label>
+                <p className="text-xs text-[#6B6B6B]">
+                  Digite a mesma senha novamente para confirmar.
+                </p>
+                <div className="relative">
+                  <TextInput
+                    id="confirmarSenha"
+                    type={mostrarConfirmar ? "text" : "password"}
+                    placeholder={mostrarConfirmar ? "Repita a senha" : "Clique aqui e repita a senha"}
+                    {...register("confirmarSenha")}
+                    error={errors.confirmarSenha?.message}
+                    autoComplete="new-password"
+                    className="pr-28"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setMostrarConfirmar(!mostrarConfirmar)}
+                    className="absolute right-2 top-1/2 -translate-y-1/2 flex items-center gap-1.5
+                      px-2.5 py-1 rounded-md text-xs font-medium text-[#1351B4]
+                      hover:bg-[#EEF4FF] transition-colors border border-transparent hover:border-[#C7D7F5]"
+                  >
+                    {mostrarConfirmar
+                      ? <><EyeOff className="w-3.5 h-3.5" /> Ocultar</>
+                      : <><Eye    className="w-3.5 h-3.5" /> Mostrar</>
+                    }
+                  </button>
+                </div>
+
+                {/* Feedback live de confirmação */}
+                {watch("confirmarSenha") && watch("confirmarSenha")!.length > 0 && (
+                  <div className={`flex items-center gap-2 text-xs font-medium mt-1
+                    ${senhaReqs.igual ? "text-green-600" : "text-red-600"}`}>
+                    {senhaReqs.igual
+                      ? <><CheckCircle2 className="w-3.5 h-3.5" /> As senhas coincidem — tudo certo!</>
+                      : <><span className="w-3.5 h-3.5 rounded-full border-2 border-red-400 inline-block" /> As senhas não coincidem ainda</>
+                    }
+                  </div>
+                )}
+                <FieldError msg={errors.confirmarSenha?.message} />
+              </div>
+
               {/* Termos */}
               <div className="pt-2 border-t border-[#E8EAF0]">
-                <label className="flex items-start gap-3 cursor-pointer">
+                <label className="flex items-start gap-3 cursor-pointer group">
                   <input
                     type="checkbox"
                     onChange={(e) =>
                       // eslint-disable-next-line @typescript-eslint/no-explicit-any
                       setValue("aceiteTermos", e.target.checked ? true : (undefined as any))
                     }
-                    className="w-4 h-4 mt-0.5 accent-[#1351B4] rounded"
+                    className="w-5 h-5 mt-0.5 accent-[#1351B4] rounded shrink-0 cursor-pointer"
                   />
-                  <span className="text-sm text-[#1B1B1B] leading-relaxed">
-                    Li e aceito os{" "}
-                    <Link href="/termos" className="text-[#1351B4] underline underline-offset-2">Termos de Uso</Link>{" "}
+                  <span className="text-sm text-[#1B1B1B] leading-relaxed group-hover:text-[#1351B4] transition-colors">
+                    Li e concordo com os{" "}
+                    <Link href="/termos" className="text-[#1351B4] underline underline-offset-2 font-medium">Termos de Uso</Link>{" "}
                     e a{" "}
-                    <Link href="/privacidade" className="text-[#1351B4] underline underline-offset-2">Política de Privacidade</Link>
+                    <Link href="/privacidade" className="text-[#1351B4] underline underline-offset-2 font-medium">Política de Privacidade</Link>
+                    {" "}da Ouvidoria Digital.
                   </span>
                 </label>
                 <FieldError msg={errors.aceiteTermos?.message} />
