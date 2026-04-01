@@ -4,6 +4,7 @@ generator client {
 
 datasource db {
   provider = "postgresql"
+  url      = env("DATABASE_URL")   // ← estava faltando — Prisma não conseguia conectar
 }
 
 // ─── Auth.js padrão ───────────────────────────────────────────────────────────
@@ -19,6 +20,7 @@ model User {
 
   cidadao       Cidadao?
   perfilInterno PerfilInterno?
+  senhaCidadao  SenhaCidadao?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -59,6 +61,16 @@ model VerificationToken {
   @@unique([identifier, token])
 }
 
+// ─── Senha (fora do padrão Auth.js — armazenada separadamente) ────────────────
+
+model SenhaCidadao {
+  id        String   @id @default(cuid())
+  userId    String   @unique
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  senha     String
+  createdAt DateTime @default(now())
+}
+
 // ─── Cidadão ──────────────────────────────────────────────────────────────────
 
 model Cidadao {
@@ -66,19 +78,46 @@ model Cidadao {
   userId         String     @unique
   user           User       @relation(fields: [userId], references: [id], onDelete: Cascade)
 
+  // Tipo de demandante
   estrangeiro    Boolean    @default(false)
   tipoPessoa     TipoPessoa @default(FISICA)
-  cpf            String?    @unique
-  naoTemCpf      Boolean    @default(false)
+
+  // Pessoa Física
   nomeCompleto   String
   nomeSocial     String?
   nomeMae        String?
   dataNascimento DateTime?
-  telefone       String?
-  cep            String?
-  endereco       String?
-  municipio      String?
-  uf             String?
+  cpf            String?    @unique
+  naoTemCpf      Boolean    @default(false)
+
+  // Estrangeiro
+  nacionalidade  String?
+  paisOrigem     String?
+  cidadeOrigem   String?
+
+  // Pessoa Jurídica
+  nomeEmpresa        String?
+  cnpj               String?
+  nomeRepresentante  String?
+  cpfRepresentante   String?
+  emailRepresentante String?
+  contratoEmpresa    String?
+
+  // Endereço
+  cep          String?
+  logradouro   String?
+  numero       String?
+  complemento  String?
+  bairro       String?
+  cidade       String?
+  estado       String?
+  // aliases para compatibilidade
+  endereco     String?
+  municipio    String?
+  uf           String?
+
+  // Contato
+  telefone     String?
 
   manifestacoes Manifestacao[]
 
