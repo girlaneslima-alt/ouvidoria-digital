@@ -254,28 +254,29 @@ export default function HomePage() {
             })}
           </div>
 
-          {/* CTA abaixo dos passos */}
-          <div className="mt-10 text-center">
-            <Link href="/nova-manifestacao">
-              <Button size="lg" className="font-bold text-base px-8 shadow-md shadow-[#1351b4]/20">
-                Começar agora
-                <ArrowRight className="w-5 h-5 ml-1" />
-              </Button>
-            </Link>
-          </div>
         </div>
       </section>
 
+      {/* ── Separador visual entre seções ──────────────────────────── */}
+      <div className="relative flex items-center justify-center py-0" aria-hidden="true">
+        <div className="absolute inset-x-0 top-1/2 h-px bg-gradient-to-r from-transparent via-[#1351B4]/20 to-transparent" />
+        <div className="relative z-10 flex items-center gap-1.5 bg-white px-4 py-1.5 rounded-full border border-[#E8EAF0] shadow-sm">
+          <div className="w-1.5 h-1.5 rounded-full bg-[#1351B4]/30" />
+          <div className="w-1.5 h-1.5 rounded-full bg-[#1351B4]/50" />
+          <div className="w-1.5 h-1.5 rounded-full bg-[#1351B4]/30" />
+        </div>
+      </div>
+
       {/* ── SEÇÃO 3: O que você quer fazer? ────────────────────────── */}
       <section
-        className="py-12 px-4"
+        className="pt-8 pb-12 px-4"
         style={{ background: "linear-gradient(180deg, #F8F9FC 0%, #FFFFFF 100%)" }}
         id="manifestacoes"
       >
         <div className="max-w-6xl mx-auto">
 
-          <div className="text-center mb-10">
-            <h2 className="text-2xl sm:text-3xl font-bold mb-3 text-[#1B1B1B]">
+          <div className="text-center mb-8">
+            <h2 className="text-2xl sm:text-3xl font-bold mb-2 text-[#1B1B1B]">
               O que você quer{" "}
               <span style={{ color: "#1351B4" }}>fazer hoje?</span>
             </h2>
