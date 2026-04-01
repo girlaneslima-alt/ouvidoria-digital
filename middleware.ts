@@ -1,8 +1,8 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
-// Rotas que exigem autenticação
-const ROTAS_PROTEGIDAS = ["/dashboard", "/nova-manifestacao", "/minhas-manifestacoes", "/settings"];
+// Rotas que exigem autenticação (nova-manifestacao é pública — aceita anônimos)
+const ROTAS_PROTEGIDAS = ["/dashboard", "/minhas-manifestacoes", "/settings", "/manifestacao"];
 
 export function middleware(req: NextRequest) {
   const { pathname } = req.nextUrl;
@@ -25,5 +25,5 @@ export function middleware(req: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/dashboard/:path*", "/nova-manifestacao/:path*", "/minhas-manifestacoes/:path*", "/settings/:path*"],
+  matcher: ["/dashboard/:path*", "/minhas-manifestacoes/:path*", "/settings/:path*", "/manifestacao/:path*"],
 };
