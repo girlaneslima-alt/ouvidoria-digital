@@ -31,13 +31,23 @@ export const TIPO_MANIFESTACAO_LABELS: Record<TipoManifestacao, string> = {
 };
 
 export const TIPO_MANIFESTACAO_DESCRICAO: Record<TipoManifestacao, string> = {
-  DENUNCIA: "Comunicar irregularidade na administração pública.",
-  ELOGIO: "Registrar satisfação com o atendimento ou serviço.",
-  SOLICITACAO: "Pedir a realização de um serviço público.",
-  SUGESTAO: "Sugerir melhorias nos serviços e atendimentos.",
-  SIMPLIFIQUE: "Solicitar a simplificação de serviços ou processos públicos.",
-  INFORMACAO: "Solicitar informações ou esclarecimentos sobre ações, serviços, programas, benefícios.",
-  RECLAMACAO: "Registrar insatisfação com serviço, programa ou atendimento público.",
+  DENUNCIA:    "Viu algo errado? Reporte irregularidades, desvios ou condutas inadequadas de servidores.",
+  RECLAMACAO:  "Foi mal atendido ou um serviço não funcionou como deveria? Registre aqui.",
+  SOLICITACAO: "Precisa de um serviço ou benefício ao qual você tem direito? Faça seu pedido.",
+  SUGESTAO:    "Tem uma ideia para melhorar um serviço público? Queremos ouvir você.",
+  ELOGIO:      "Recebeu um ótimo atendimento? Reconheça quem fez a diferença.",
+  INFORMACAO:  "Tem dúvidas sobre um serviço, benefício ou programa do governo?",
+  SIMPLIFIQUE: "Achou um processo complicado demais? Sugira como deixá-lo mais simples.",
+};
+
+export const TIPO_MANIFESTACAO_MICROCOPY: Record<TipoManifestacao, string> = {
+  DENUNCIA:    "Você pode denunciar de forma anônima, se preferir.",
+  RECLAMACAO:  "Sua reclamação contribui para melhorar o serviço público.",
+  SOLICITACAO: "Ex: emissão de documentos, acesso a benefícios, reparos.",
+  SUGESTAO:    "Sugestões são analisadas e podem virar mudanças reais.",
+  ELOGIO:      "Elogios ajudam a valorizar servidores e boas práticas.",
+  INFORMACAO:  "Ex: como solicitar o Bolsa Família, prazo de um processo.",
+  SIMPLIFIQUE: "Ex: muita burocracia para acessar um serviço básico.",
 };
 
 export const TIPO_MANIFESTACAO_COR: Record<TipoManifestacao, string> = {

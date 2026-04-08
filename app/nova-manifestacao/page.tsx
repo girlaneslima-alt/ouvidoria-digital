@@ -14,13 +14,14 @@ import { Checkbox } from "@/components/ui/checkbox";
 import {
   AlertTriangle, ThumbsUp, FileText, Lightbulb,
   Layers, Info, ThumbsDown, CheckCircle2, Plus, Trash2,
-  ChevronRight, Volume2, Upload,
+  ChevronRight, Volume2, Upload, Lock, Clock, ClipboardList,
 } from "lucide-react";
 import { toast } from "sonner";
 import { novaManifestacaoSchema, type NovaManifestacaoInput } from "@/lib/validations";
 import {
   TIPO_MANIFESTACAO_LABELS,
   TIPO_MANIFESTACAO_DESCRICAO,
+  TIPO_MANIFESTACAO_MICROCOPY,
   TIPO_MANIFESTACAO_COR,
 } from "@/lib/manifestacao";
 
@@ -33,6 +34,9 @@ const TIPOS = [
   { key: "INFORMACAO",  icon: Info          },
   { key: "SIMPLIFIQUE", icon: Layers        },
 ] as const;
+
+const TIPOS_ROW1 = TIPOS.slice(0, 4);
+const TIPOS_ROW2 = TIPOS.slice(4);
 
 const TIPO_TITULO: Record<string, string> = {
   DENUNCIA:    "Faça sua denúncia",
@@ -161,17 +165,40 @@ export default function NovaManifestacaoPage() {
           {/* Seleção de tipo */}
           {!tipoSelecionado ? (
             <div>
-              <h1 className="text-2xl font-bold mb-1" style={{ color: "#1351B4" }}>O que você quer fazer?</h1>
-              <p className="text-sm text-muted-foreground mb-8">Selecione o tipo de manifestação para continuar.</p>
-              <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
-                {TIPOS.map(({ key, icon: Icon }) => {
+              <h1 className="text-2xl font-bold mb-1" style={{ color: "#1351B4" }}>Como podemos te ajudar?</h1>
+              <p className="text-sm text-muted-foreground mb-5">
+                Escolha o que melhor descreve sua situação. Suas informações são protegidas —{" "}
+                a ouvidoria responde em <strong>até 20 dias úteis</strong>.
+              </p>
+
+              {/* Bloco de confiança */}
+              <div className="flex flex-col sm:flex-row gap-3 mb-8 px-4 py-3 rounded-xl" style={{ background: "#EEF4FF", border: "1px solid #C7D7F5" }}>
+                <div className="flex items-center gap-2 text-xs flex-1" style={{ color: "#0C326F" }}>
+                  <Lock className="w-3.5 h-3.5 flex-shrink-0" />
+                  <span>Sigilo garantido — dados protegidos por lei</span>
+                </div>
+                <div className="hidden sm:block w-px bg-[#C7D7F5]" />
+                <div className="flex items-center gap-2 text-xs flex-1" style={{ color: "#0C326F" }}>
+                  <Clock className="w-3.5 h-3.5 flex-shrink-0" />
+                  <span>Resposta em até 20 dias úteis</span>
+                </div>
+                <div className="hidden sm:block w-px bg-[#C7D7F5]" />
+                <div className="flex items-center gap-2 text-xs flex-1" style={{ color: "#0C326F" }}>
+                  <ClipboardList className="w-3.5 h-3.5 flex-shrink-0" />
+                  <span>Acompanhe pelo protocolo, sem precisar ligar</span>
+                </div>
+              </div>
+
+              {/* Row 1 — 4 cards */}
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+                {TIPOS_ROW1.map(({ key, icon: Icon }) => {
                   const c = (TIPO_MANIFESTACAO_COR as Record<string, string>)[key];
                   return (
                     <button
                       key={key}
                       type="button"
                       onClick={() => selecionarTipo(key)}
-                      className="bg-white rounded-2xl border-2 p-5 text-left transition-all hover:shadow-md"
+                      className="bg-white rounded-2xl border-2 p-4 text-left transition-all hover:shadow-md"
                       style={{ borderColor: "#E8EAF0" }}
                       onMouseEnter={(e) => { (e.currentTarget as HTMLButtonElement).style.borderColor = c; }}
                       onMouseLeave={(e) => { (e.currentTarget as HTMLButtonElement).style.borderColor = "#E8EAF0"; }}
@@ -184,6 +211,40 @@ export default function NovaManifestacaoPage() {
                       </p>
                       <p className="text-xs text-muted-foreground mt-1 leading-snug">
                         {(TIPO_MANIFESTACAO_DESCRICAO as Record<string, string>)[key]}
+                      </p>
+                      <p className="text-xs mt-2 leading-snug font-medium" style={{ color: c }}>
+                        {(TIPO_MANIFESTACAO_MICROCOPY as Record<string, string>)[key]}
+                      </p>
+                    </button>
+                  );
+                })}
+              </div>
+
+              {/* Row 2 — 3 cards centralizados */}
+              <div className="mt-4 grid grid-cols-1 sm:grid-cols-3 gap-4 sm:w-[calc(75%-0.375rem)] sm:mx-auto">
+                {TIPOS_ROW2.map(({ key, icon: Icon }) => {
+                  const c = (TIPO_MANIFESTACAO_COR as Record<string, string>)[key];
+                  return (
+                    <button
+                      key={key}
+                      type="button"
+                      onClick={() => selecionarTipo(key)}
+                      className="bg-white rounded-2xl border-2 p-4 text-left transition-all hover:shadow-md"
+                      style={{ borderColor: "#E8EAF0" }}
+                      onMouseEnter={(e) => { (e.currentTarget as HTMLButtonElement).style.borderColor = c; }}
+                      onMouseLeave={(e) => { (e.currentTarget as HTMLButtonElement).style.borderColor = "#E8EAF0"; }}
+                    >
+                      <div className="w-10 h-10 rounded-xl flex items-center justify-center mb-3" style={{ background: `${c}18` }}>
+                        <Icon className="w-5 h-5" style={{ color: c }} />
+                      </div>
+                      <p className="text-sm font-semibold text-[#1B1B1B]">
+                        {(TIPO_MANIFESTACAO_LABELS as Record<string, string>)[key]}
+                      </p>
+                      <p className="text-xs text-muted-foreground mt-1 leading-snug">
+                        {(TIPO_MANIFESTACAO_DESCRICAO as Record<string, string>)[key]}
+                      </p>
+                      <p className="text-xs mt-2 leading-snug font-medium" style={{ color: c }}>
+                        {(TIPO_MANIFESTACAO_MICROCOPY as Record<string, string>)[key]}
                       </p>
                     </button>
                   );
